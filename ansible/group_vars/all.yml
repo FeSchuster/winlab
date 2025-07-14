@@ -1,0 +1,6 @@
+---
+ait_ssh_proxy_user: aecid
+ait_ssh_proxy_host: "{{ hostvars['mgmt'].openstack.addresses.winlab_network[1]['addr'] }}"
+ait_ssh_proxy_address: "{{ ait_ssh_proxy_user }}@{{ ait_ssh_proxy_host }}"
+
+ansible_ssh_common_args: -o ControlMaster=auto -o ControlPersist=30m -o StrictHostKeyChecking=no -J {{ ait_ssh_proxy_address }}

@@ -1,0 +1,2 @@
+test -e .env && source .env
+test -e venv/bin/activate && source venv/bin/activate

@@ -1,0 +1,215 @@
+###################################################################
+#
+# INSTANCE "mgmt"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "mgmt" {
+    name            = "mgmt"
+    image_id        = var.image_debian_12
+    flavor_name     = var.flavour_debian_12
+    security_groups = [openstack_networking_secgroup_v2.security_group_mgmt.name]
+
+    user_data = file("scripts/cloud_init_linux.yml")
+
+    tags = [ "linux" ]
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["mgmt"]
+    }
+}
+
+resource "openstack_networking_floatingip_v2" "mgmt_ip" {
+    pool = var.provider_network_name
+}
+
+data "openstack_networking_port_v2" "mgmt_port" {
+    device_id  = openstack_compute_instance_v2.mgmt.id
+    network_id = openstack_compute_instance_v2.mgmt.network.0.uuid
+}
+
+resource "openstack_networking_floatingip_associate_v2" "mgmt_ip_associate" {
+    floating_ip = openstack_networking_floatingip_v2.mgmt_ip.address
+    port_id     = data.openstack_networking_port_v2.mgmt_port.id
+}
+
+output "mgmt_ip" {
+  value = openstack_networking_floatingip_v2.mgmt_ip.address
+}
+
+###################################################################
+#
+# INSTANCE "dc1"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "dc1" {
+    name            = "dc1"
+    image_id        = var.image_windows_server_2022
+    flavor_name     = var.flavour_windows_server_2022
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "dc", "tier_0" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["dc1"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "dc2"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "dc2" {
+    name            = "dc2"
+    image_id        = var.image_windows_server_2022
+    flavor_name     = var.flavour_windows_server_2022
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "dc", "tier_0" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["dc2"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "webserver"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "webserver" {
+    name            = "webserver"
+    image_id        = var.image_windows_server_2022
+    flavor_name     = var.flavour_windows_server_2022
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "server", "tier_1" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["webserver"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "fileserver"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "fileserver" {
+    name            = "fileserver"
+    image_id        = var.image_windows_server_2022
+    flavor_name     = var.flavour_windows_server_2022
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "server", "tier_1" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["fileserver"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "wec"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "wec" {
+    name            = "wec"
+    image_id        = var.image_windows_server_2022
+    flavor_name     = var.flavour_windows_server_2022
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "server", "tier_1" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["wec"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "pc1"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "pc1" {
+    name            = "pc1"
+    image_id        = var.image_windows_10
+    flavor_name     = var.flavour_windows_10
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "workstation", "tier_2" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["pc1"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "pc2"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "pc2" {
+    name            = "pc2"
+    image_id        = var.image_windows_10
+    flavor_name     = var.flavour_windows_10
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    tags = [ "windows", "workstation", "tier_2" ]
+
+    user_data = file("scripts/cloud_init_windows.ps1")
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["pc2"]
+    }
+}
+
+###################################################################
+#
+# INSTANCE "kafka"
+#
+###################################################################
+
+resource "openstack_compute_instance_v2" "kafka" {
+    name            = "kafka"
+    image_id        = var.image_ubuntu_24
+    flavor_name     = var.flavour_ubuntu_24
+    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+
+    user_data = file("scripts/cloud_init_linux.yml")
+
+    tags = [ "linux" ]
+
+    network {
+        name = openstack_networking_network_v2.winlab_network.name
+        fixed_ip_v4 = var.winlab_ips["kafka"]
+    }
+}

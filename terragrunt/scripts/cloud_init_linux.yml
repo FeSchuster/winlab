@@ -1,0 +1,10 @@
+#cloud-config
+users:
+  - name: aecid
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    lock_passwd: false
+    plain_text_passwd: 'P@ssword'
+    ssh_authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXEb4y+yzaaQUaGk6I0Vb5L7NYqLK5l6Mn4Yeu57/8/ felix@Ubuntu"
