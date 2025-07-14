@@ -1,56 +1,62 @@
 ---
-# - name: Configure Primary DC
-#   hosts: dc1
-#   vars:
-#     domainName: "aecid-testbed.com"
-#   roles:
-#   - atb-ansible-primarydc
+- name: Configure Primary DC
+  hosts: dc1
+  vars:
+    # atb-ansible-primarydc playbook vars
+    domainName: "aecid-testbed.com"
+    # atb-ansible-windowseventcollector playbook vars
+    kafka_broker_ip: "{{ hostvars['kafka']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+  roles:
+  - atb-ansible-primarydc
+  - atb-ansible-windowseventcollector
 
-# - name: Configure Secondary DC
-#   hosts: dc2
-#   vars:
-#     DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
-#     domainName: "aecid-testbed.com"
-#     domainAdminAccount: "administrator@aecid-testbed.com"
-#     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
-#     hostname: "dc2"
-#   roles:
-#   - atb-ansible-msclient
-#   - atb-ansible-secondarydc
+- name: Configure Secondary DC
+  hosts: dc2
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "dc2"
+  roles:
+  - atb-ansible-msclient
+  - atb-ansible-secondarydc
 
-# - name: Configure Kafka
-#   hosts: kafka
-#   become: true
-#   roles:
-#   - atb-ansible-kafka
+- name: Configure Kafka
+  hosts: kafka
+  become: true
+  roles:
+  - atb-ansible-kafka
 
-# - name: Configure WEC
-#   hosts: wec
-#   vars:
-#     DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
-#     domainName: "aecid-testbed.com"
-#     domainAdminAccount: "administrator@aecid-testbed.com"
-#     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
-#     hostname: "wec"
-#   roles:
-#   - atb-ansible-msclient
+- name: Configure WEC
+  hosts: wec
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "wec"
+  roles:
+  - atb-ansible-msclient
 
-# - name: Configure Webserver
-#   hosts: webserver
-#   vars:
-#     # msclient
-#     DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
-#     domainName: "aecid-testbed.com"
-#     domainAdminAccount: "administrator@aecid-testbed.com"
-#     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
-#     hostname: "webserver"
-#     # winvulnserver
-#     admin_user: "wsadmin@aecid-testbed.com"
-#     admin_password: "Root.PW1"
-#   roles:
-#   - atb-ansible-msclient
-#   - atb-ansible-winwebserver
-#   - atb-ansible-winvulnserver
+- name: Configure Webserver
+  hosts: webserver
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "webserver"
+    # atb-ansible-winvulnserver playbook vars
+    admin_user: "wsadmin@aecid-testbed.com"
+    admin_password: "Root.PW1"
+  roles:
+  - atb-ansible-msclient
+  - atb-ansible-winwebserver
+  - atb-ansible-winvulnserver
 
 
 
