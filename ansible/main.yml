@@ -4,11 +4,8 @@
   vars:
     # atb-ansible-primarydc playbook vars
     domainName: "aecid-testbed.com"
-    # atb-ansible-windowseventcollector playbook vars
-    kafka_broker_ip: "{{ hostvars['kafka']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
   roles:
   - atb-ansible-primarydc
-  - atb-ansible-windowseventcollector
 
 - name: Configure Secondary DC
   hosts: dc2
@@ -26,6 +23,10 @@
 - name: Configure Kafka
   hosts: kafka
   become: true
+  vars:
+    kafka_listeners: "INTERNAL://localhost:9093,EXTERNAL://:9092"
+    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}:9092"
+    kafka_listener_security_proto_map: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
   roles:
   - atb-ansible-kafka
 
@@ -38,8 +39,11 @@
     domainAdminAccount: "administrator@aecid-testbed.com"
     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
     hostname: "wec"
+    # atb-ansible-windowseventcollector playbook vars
+    kafka_broker_ip: "{{ hostvars['kafka']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
   roles:
   - atb-ansible-msclient
+  - atb-ansible-windowseventcollector
 
 - name: Configure Webserver
   hosts: webserver
@@ -58,8 +62,16 @@
   - atb-ansible-winwebserver
   - atb-ansible-winvulnserver
 
-
-
+- name: Finish Windows Setup
+  hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Update Group Policy
+      win_command: gpupdate /force
+    - name: Set Keyboard Layout to German
+      win_shell: |
+        $LangList = New-WinUserLanguageList de-DE
+        Set-WinUserLanguageList $LangList -Force
 
 
 
