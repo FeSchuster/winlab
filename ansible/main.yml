@@ -25,7 +25,7 @@
   become: true
   vars:
     kafka_listeners: "INTERNAL://localhost:9093,EXTERNAL://:9092"
-    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}:9092"
+    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['kafka']['openstack']['addresses']['winlab_network'][0]['addr'] }}:9092"
     kafka_listener_security_proto_map: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
   roles:
   - atb-ansible-kafka

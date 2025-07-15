@@ -111,10 +111,21 @@
     git clone git@github.com:ait-testbed/atb-ansible-kafka.git
     git clone git@github.com:FeSchuster/atb-ansible-winwebserver.git
     git clone git@github.com:FeSchuster/atb-ansible-winvulnserver.git
+    git clone git@github.com:FeSchuster/atb-ansible-windowseventcollector.git
 
-    git clone git@github.com:ait-testbed/atb-ansible-windowseventcollector.git
     git clone git@github.com:ait-testbed/atb-ansible-winfileserver.git
     git clone git@github.com:ait-testbed/atb-ansible-ghostserver.git
     git clone git@github.com:ait-testbed/atb-ansible-ghostagent.git
     git clone git@github.com:ait-testbed/atb-ansible-ghostagent-linux.git
     ```
+
+# Attackmate
+
+# Log Collection
+
+Logs will be saved to `/var/lib/kafka/windows-0` on the kafka host.
+
+Log Collection PoC:
+```bash
+/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.0.249:9092 --topic windows --from-beginning
+```
