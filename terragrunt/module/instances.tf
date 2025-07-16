@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "mgmt" {
 
     user_data = file("scripts/cloud_init_linux.yml")
 
-    tags = [ "linux" ]
+    tags = [ "linux", "ubuntu" ]
 
     network {
         name = openstack_networking_network_v2.winlab_network.name
@@ -232,13 +232,13 @@ resource "openstack_compute_instance_v2" "pc2" {
 
 resource "openstack_compute_instance_v2" "attacker" {
     name            = "attacker"
-    image_id        = var.image_ubuntu_24
-    flavor_name     = var.flavour_ubuntu_24
+    image_id        = var.image_kali
+    flavor_name     = var.flavour_kali
     security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     user_data = file("scripts/cloud_init_linux.yml")
 
-    tags = [ "linux" ]
+    tags = [ "linux", "kali" ]
 
     network {
         name = openstack_networking_network_v2.winlab_network.name

