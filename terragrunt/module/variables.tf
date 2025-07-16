@@ -36,8 +36,6 @@ variable "winlab_ips" {
     type        = map(string)
     description = "IP addresses for various machines"
     default = {
-        mgmt = "10.0.0.250"
-        kafka = "10.0.0.249"
         dc1 = "10.0.0.10"
         dc2 = "10.0.0.11"
         webserver = "10.0.0.20"
@@ -45,6 +43,8 @@ variable "winlab_ips" {
         wec = "10.0.0.22"
         pc1 = "10.0.0.100"
         pc2 = "10.0.0.101"
+        attacker = "10.0.0.200"
+        mgmt = "10.0.0.250"
     }
 }
 

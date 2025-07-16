@@ -1,14 +1,14 @@
 vars:
-  TARGET: 192.168.10.123
-  ATTACKER: 192.168.10.142
+  TARGET: 10.0.0.20
+  ATTACKER: 10.0.0.200
   USER: Alice
   DOMAIN: aecid-testbed.com
   PASSWORD: Pa$$w0rd
   PAYLOADS: /home/ubuntu/payloads
   PAYLOAD: "windows/x64/meterpreter/reverse_tcp"
   DOMADM: "wsadmin"
-  DOMADMPW: " Root.PW1 "
-  DOMDC: 192.168.10.228
+  DOMADMPW: "Root.PW1"
+  DOMDC: 10.0.0.10
   DOMHOST: dc1.aecid-testbed.com
 
 commands:

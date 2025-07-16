@@ -1,6 +1,12 @@
 #!/bin/bash
 
-read -p "MGMT IP: " mgmt_ip
+# Get mgmt_ip from first argument or prompt for it
+if [[ -n "$1" ]]; then
+  mgmt_ip="$1"
+else
+  read -p "MGMT IP: " mgmt_ip
+fi
+
 user="aecid"
 known_hosts="$HOME/.ssh/known_hosts"
 
@@ -14,7 +20,7 @@ hosts=(
   "10.0.0.22"
   "10.0.0.100"
   "10.0.0.101"
-  "10.0.0.249"
+  "10.0.0.200"
 )
 
 echo "Testing SSH connections ..."

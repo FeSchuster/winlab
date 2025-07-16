@@ -6,8 +6,8 @@
 
 resource "openstack_compute_instance_v2" "mgmt" {
     name            = "mgmt"
-    image_id        = var.image_debian_12
-    flavor_name     = var.flavour_debian_12
+    image_id        = var.image_ubuntu_24
+    flavor_name     = var.flavour_ubuntu_24
     security_groups = [openstack_networking_secgroup_v2.security_group_mgmt.name]
 
     user_data = file("scripts/cloud_init_linux.yml")
@@ -18,6 +18,10 @@ resource "openstack_compute_instance_v2" "mgmt" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["mgmt"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 resource "openstack_networking_floatingip_v2" "mgmt_ip" {
@@ -48,7 +52,7 @@ resource "openstack_compute_instance_v2" "dc1" {
     name            = "dc1"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "dc", "tier_0" ]
 
@@ -58,6 +62,10 @@ resource "openstack_compute_instance_v2" "dc1" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["dc1"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -70,7 +78,7 @@ resource "openstack_compute_instance_v2" "dc2" {
     name            = "dc2"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "dc", "tier_0" ]
 
@@ -80,6 +88,10 @@ resource "openstack_compute_instance_v2" "dc2" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["dc2"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -92,7 +104,7 @@ resource "openstack_compute_instance_v2" "webserver" {
     name            = "webserver"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -102,6 +114,10 @@ resource "openstack_compute_instance_v2" "webserver" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["webserver"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -114,7 +130,7 @@ resource "openstack_compute_instance_v2" "fileserver" {
     name            = "fileserver"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -124,6 +140,10 @@ resource "openstack_compute_instance_v2" "fileserver" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["fileserver"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -136,7 +156,7 @@ resource "openstack_compute_instance_v2" "wec" {
     name            = "wec"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -146,6 +166,10 @@ resource "openstack_compute_instance_v2" "wec" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["wec"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -158,7 +182,7 @@ resource "openstack_compute_instance_v2" "pc1" {
     name            = "pc1"
     image_id        = var.image_windows_10
     flavor_name     = var.flavour_windows_10
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "workstation", "tier_2" ]
 
@@ -168,6 +192,10 @@ resource "openstack_compute_instance_v2" "pc1" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["pc1"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
@@ -180,7 +208,7 @@ resource "openstack_compute_instance_v2" "pc2" {
     name            = "pc2"
     image_id        = var.image_windows_10
     flavor_name     = var.flavour_windows_10
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     tags = [ "windows", "workstation", "tier_2" ]
 
@@ -190,19 +218,23 @@ resource "openstack_compute_instance_v2" "pc2" {
         name = openstack_networking_network_v2.winlab_network.name
         fixed_ip_v4 = var.winlab_ips["pc2"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
 
 ###################################################################
 #
-# INSTANCE "kafka"
+# INSTANCE "attacker"
 #
 ###################################################################
 
-resource "openstack_compute_instance_v2" "kafka" {
-    name            = "kafka"
+resource "openstack_compute_instance_v2" "attacker" {
+    name            = "attacker"
     image_id        = var.image_ubuntu_24
     flavor_name     = var.flavour_ubuntu_24
-    security_groups = [openstack_networking_secgroup_v2.security_group_windows.name]
+    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
 
     user_data = file("scripts/cloud_init_linux.yml")
 
@@ -210,6 +242,10 @@ resource "openstack_compute_instance_v2" "kafka" {
 
     network {
         name = openstack_networking_network_v2.winlab_network.name
-        fixed_ip_v4 = var.winlab_ips["kafka"]
+        fixed_ip_v4 = var.winlab_ips["attacker"]
     }
+
+    depends_on = [
+        openstack_networking_subnet_v2.winlab_subnet
+    ]
 }
