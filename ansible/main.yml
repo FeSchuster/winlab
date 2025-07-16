@@ -1,5 +1,4 @@
 ---
-
 - name: Update APT Cache on Linux Machines
   hosts: linux
   become: true
@@ -7,6 +6,86 @@
     - name: Update APT Cache
       ansible.builtin.apt:
         update_cache: yes
+
+- name: Configure Keyboard Layout on Windows Machines
+  hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Set Keyboard Layout to German
+      win_shell: |
+        $LangList = New-WinUserLanguageList de-DE
+        Set-WinUserLanguageList $LangList -Force
+
+- name: Configure Primary DC
+  hosts: dc1
+  vars:
+    # atb-ansible-primarydc playbook vars
+    domainName: "aecid-testbed.com"
+  roles:
+  - atb-ansible-primarydc
+
+- name: Configure Secondary DC
+  hosts: dc2
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "dc2"
+  roles:
+  - atb-ansible-msclient
+  - atb-ansible-secondarydc
+
+- name: Configure Kafka
+  hosts: mgmt
+  become: true
+  vars:
+    # atb-ansible-kafka playbook vars
+    kafka_listeners: "INTERNAL://localhost:9093,EXTERNAL://:9092"
+    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['mgmt']['openstack']['addresses']['winlab_network'][0]['addr'] }}:9092"
+    kafka_listener_security_proto_map: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+  roles:
+  - atb-ansible-kafka
+
+- name: Configure WEC
+  hosts: wec
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "wec"
+    # atb-ansible-windowseventcollector playbook vars
+    kafka_broker_ip: "{{ hostvars['mgmt']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+  roles:
+  - atb-ansible-msclient
+  - atb-ansible-windowseventcollector
+
+- name: Configure Webserver
+  hosts: webserver
+  vars:
+    # atb-ansible-msclient playbook vars
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    domainName: "aecid-testbed.com"
+    domainAdminAccount: "administrator@aecid-testbed.com"
+    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
+    hostname: "webserver"
+    # atb-ansible-winvulnserver playbook vars
+    admin_user: "wsadmin@aecid-testbed.com"
+    admin_password: "Root.PW1"
+  roles:
+  - atb-ansible-msclient
+  - atb-ansible-winwebserver
+  - atb-ansible-winvulnserver
+
+- name: Update Group Policy on Windows Machines
+  hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Update Group Policy
+      win_command: gpupdate /force
 
 - name: Configure Attacker Machine
   hosts: attacker
