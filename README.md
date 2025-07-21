@@ -1,15 +1,20 @@
-# Initial Setup
+# Winlab
 
-- Add the following Firefox exceptions:
-    ```txt
-    openstack.cyberrange.internal:443
-    openstack.cyberrange.internal:5000
-    openstack.cyberrange.internal:6080
-    ```
+Winlab is an intentionally vulnerable Windows Active Directory lab designed for cybersecurity research.
 
-# Windows Images
+## Network
 
-- Enable Windows Feature Hyper-V
+![Network](./docs/winlab_network.png)
+
+## Killchain
+
+![Killchain](./docs/winlab_killchain.png)
+
+# Deployment
+
+## Windows Images
+
+- Enable Windows feature Hyper-V
 - Install the Windows Assessment and Deployment Kit, see https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install
 - Download Windows Server 2022 Evaluation Edition from https://www.microsoft.com/de-de/evalcenter/download-windows-server-2022
 - Download Windows 10 Evaluation Edition from https://www.microsoft.com/en-us/evalcenter/download-windows-10-enterprise
@@ -73,7 +78,7 @@
     openstack image create "windows-10" --file windows-10.qcow2 --disk-format qcow2 --container-format bare --progress
     ```
 
-# Kali Image
+## Kali Image
 
 - Download the Kali Generic Cloud Image for x64 from https://www.kali.org/get-kali/#kali-cloud
 
@@ -102,20 +107,32 @@
     openstack image create "kali-2025.2" --file kali-2025.2.qcow2 --disk-format qcow2 --container-format bare --progress
     ```
 
-# Terraform
+## Terragrunt
 
-- Update the provider_network GUID variable in `terragrunt.hcl`
-- `terraform init`
-- `terraform apply`
+- Update the `provider_network_uuid` variable in `terragrunt.hcl`
+- Initialise Terragrunt:
+    ```bash
+    terragrunt init
+    ```
+- Deploy the environment:
+    ```bash
+    terragrunt apply
+    ```
+- Add the following exceptions to Firefox:
+    ```txt
+    openstack.cyberrange.internal:443
+    openstack.cyberrange.internal:5000
+    openstack.cyberrange.internal:6080
+    ```
 
-# Ansible
+## Ansible
 
 - Install `sshpass` for SSH password authentication:
     ```bash
     sudo apt-get install sshpass
     ```
 
-- Check if all hosts are up and running (might take up to 15min after deploying with terraform, depending on machine specs):
+- Check if all hosts are up and running (this might take up to 15min after deploying with Terragrunt, depending on the machine specs):
     ```bash
     bash ansible/test_ssh.sh
     ansible all -m raw -a whoami
@@ -142,7 +159,7 @@
     git clone git@github.com:FeSchuster/atb-ansible-winvulnserver.git
     git clone git@github.com:FeSchuster/atb-ansible-windowseventcollector.git
     git clone git@github.com:ait-testbed/attackmate-ansible.git
-
+    # currently unused:
     git clone git@github.com:ait-testbed/atb-ansible-winfileserver.git
     git clone git@github.com:ait-testbed/atb-ansible-ghostserver.git
     git clone git@github.com:ait-testbed/atb-ansible-ghostagent.git
@@ -155,19 +172,19 @@
     ansible-playbook main.yml
     ```
 
-# Attackmate
+## Attackmate
 
-Attacker machine already got configured by the Ansible playbooks, start the attacks with:
+Attacker machine was already configured by the Ansible playbooks, start the attacks with:
 ```bash
 ssh -J aecid@<MGMT_IP> aecid@10.0.0.200
 attackm8 /home/aecid/killchain
 ```
 
-# Log Collection
+## Log Collection
 
-Logs will be saved to `/var/lib/kafka/windows-0` on the Kafka host.
+Log telemetry is collected by Sysmon, forwarded to the Windows Event Collector (WEC) via Group Policy settings, and then sent to the MGMT host using Kafka. On the MGMT host, all logs are persistently stored in the `/var/lib/kafka/windows-0/` directory.
 
-Log Collection PoC:
+To watch the logs stream in real time, run the following command:
 ```bash
 /usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.0.250:9092 --topic windows --from-beginning
 ```
