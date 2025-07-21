@@ -88,7 +88,7 @@
       win_command: gpupdate /force
 
 - name: Install Attackmate
-  hosts: attacker
+  hosts: kali
   become: true
   vars:
     # attackmate-ansible playbook vars
@@ -101,7 +101,7 @@
   - attackmate-ansible
 
 - name: Install Dependencies
-  hosts: attacker
+  hosts: kali
   become: true
   tasks:
     - name: Install unzip
@@ -114,7 +114,7 @@
         update_cache: yes
 
 - name: Install Metasploit v.6.4.64
-  hosts: attacker
+  hosts: kali
   become: true
   vars:
     msf_deb_url: "https://old.kali.org/kali/pool/main/m/metasploit-framework/metasploit-framework_6.4.64-0kali1_amd64.deb"
@@ -130,15 +130,15 @@
         state: present
 
 - name: Start msfrpcd
-  hosts: attacker
+  hosts: kali
   tasks:
     - name: Start msfrpcd
       shell: msfrpcd -P hackerman
 
 - name: Download Binaries
-  hosts: attacker
+  hosts: kali
   tasks:
-    - name: Copy Attackmate Playbook to Attacker Machine
+    - name: Copy Attackmate Playbook to Kali Machine
       ansible.builtin.copy:
         src: "../attackmate/killchain.yml"
         dest: "/home/aecid/killchain.yml"
@@ -175,26 +175,3 @@
       file:
         path: /home/aecid/tmp
         state: absent
-
-
-
-# single var for all roles
-# - name: Configure Secondary DC
-#   hosts: dc2
-#   vars:
-#     DNSIP: "10.0.0.10"
-#   roles:
-#   - atb-ansible-msclient
-#   - atb-ansible-secondarydc
-
-
-# multiple vars for multiple roles
-# - name: Configure Secondary DC
-#   hosts: dc2
-#   roles:
-#   - role: atb-ansible-msclient
-#     vars:
-#       DNSIP: "10.0.0.10"
-#   - role: atb-ansible-secondarydc
-#     vars:
-#       DNSIP: "10.0.0.10"

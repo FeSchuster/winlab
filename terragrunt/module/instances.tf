@@ -226,12 +226,12 @@ resource "openstack_compute_instance_v2" "pc2" {
 
 ###################################################################
 #
-# INSTANCE "attacker"
+# INSTANCE "kali"
 #
 ###################################################################
 
-resource "openstack_compute_instance_v2" "attacker" {
-    name            = "attacker"
+resource "openstack_compute_instance_v2" "kali" {
+    name            = "kali"
     image_id        = var.image_kali
     flavor_name     = var.flavour_kali
     security_groups = [openstack_networking_secgroup_v2.allow_all.name]
@@ -242,7 +242,7 @@ resource "openstack_compute_instance_v2" "attacker" {
 
     network {
         name = openstack_networking_network_v2.winlab_network.name
-        fixed_ip_v4 = var.winlab_ips["attacker"]
+        fixed_ip_v4 = var.winlab_ips["kali"]
     }
 
     depends_on = [
