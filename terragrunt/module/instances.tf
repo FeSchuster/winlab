@@ -8,7 +8,7 @@ resource "openstack_compute_instance_v2" "mgmt" {
     name            = "mgmt"
     image_id        = var.image_ubuntu_24
     flavor_name     = var.flavour_ubuntu_24
-    security_groups = [openstack_networking_secgroup_v2.security_group_mgmt.name]
+    security_groups = [openstack_networking_secgroup_v2.mgmt.name]
 
     user_data = file("scripts/cloud_init_linux.yml")
 
@@ -52,7 +52,7 @@ resource "openstack_compute_instance_v2" "dc1" {
     name            = "dc1"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "dc", "tier_0" ]
 
@@ -78,7 +78,7 @@ resource "openstack_compute_instance_v2" "dc2" {
     name            = "dc2"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "dc", "tier_0" ]
 
@@ -104,7 +104,7 @@ resource "openstack_compute_instance_v2" "webserver" {
     name            = "webserver"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -130,7 +130,7 @@ resource "openstack_compute_instance_v2" "fileserver" {
     name            = "fileserver"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -156,7 +156,7 @@ resource "openstack_compute_instance_v2" "wec" {
     name            = "wec"
     image_id        = var.image_windows_server_2022
     flavor_name     = var.flavour_windows_server_2022
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "server", "tier_1" ]
 
@@ -182,7 +182,7 @@ resource "openstack_compute_instance_v2" "pc1" {
     name            = "pc1"
     image_id        = var.image_windows_10
     flavor_name     = var.flavour_windows_10
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "workstation", "tier_2" ]
 
@@ -208,7 +208,7 @@ resource "openstack_compute_instance_v2" "pc2" {
     name            = "pc2"
     image_id        = var.image_windows_10
     flavor_name     = var.flavour_windows_10
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     tags = [ "windows", "workstation", "tier_2" ]
 
@@ -234,7 +234,7 @@ resource "openstack_compute_instance_v2" "attacker" {
     name            = "attacker"
     image_id        = var.image_kali
     flavor_name     = var.flavour_kali
-    security_groups = [openstack_networking_secgroup_v2.security_group_allow_all.name]
+    security_groups = [openstack_networking_secgroup_v2.allow_all.name]
 
     user_data = file("scripts/cloud_init_linux.yml")
 

@@ -100,6 +100,41 @@
   roles:
   - attackmate-ansible
 
+- name: Install Dependencies
+  hosts: attacker
+  become: true
+  tasks:
+    - name: Install unzip
+      apt:
+        name:
+          - unzip
+          - evil-winrm
+          # - metasploit-framework # install an older version instead, there is a bug in attackmate with metasploit version >= 6.4.74
+        state: present
+        update_cache: yes
+
+- name: Install Metasploit v.6.4.64
+  hosts: attacker
+  become: true
+  vars:
+    msf_deb_url: "https://old.kali.org/kali/pool/main/m/metasploit-framework/metasploit-framework_6.4.64-0kali1_amd64.deb"
+    msf_deb_path: "/tmp/metasploit-framework_6.4.64-0kali1_amd64.deb"
+  tasks:
+    - name: Download Metasploit .deb package
+      get_url:
+        url: "{{ msf_deb_url }}"
+        dest: "{{ msf_deb_path }}"
+    - name: Install .deb package
+      apt:
+        deb: "{{ msf_deb_path }}"
+        state: present
+
+- name: Start msfrpcd
+  hosts: attacker
+  tasks:
+    - name: Start msfrpcd
+      shell: msfrpcd -P hackerman
+
 - name: Download Binaries
   hosts: attacker
   tasks:

@@ -149,6 +149,12 @@
     git clone git@github.com:ait-testbed/atb-ansible-ghostagent-linux.git
     ```
 
+- Run playbook:
+    ```bash
+    cd ansible
+    ansible-playbook main.yml
+    ```
+
 # Attackmate
 
 Attacker machine already got configured by the Ansible playbooks, start the attacks with:
