@@ -6,10 +6,6 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
 
 ![Network](./docs/winlab_network.png)
 
-## Killchain
-
-![Killchain](./docs/winlab_killchain.png)
-
 # Deployment
 
 ## Windows Images
@@ -179,6 +175,8 @@ Attacker machine was already configured by the Ansible playbooks, start the atta
 ssh -J aecid@<MGMT_IP> aecid@10.0.0.200
 attackm8 /home/aecid/killchain
 ```
+
+![Killchain](./docs/winlab_killchain.png)
 
 ## Log Collection
 
