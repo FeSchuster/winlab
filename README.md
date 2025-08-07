@@ -2,6 +2,8 @@
 
 Winlab is an intentionally vulnerable Windows Active Directory lab designed for cybersecurity research.
 
+![Network](./docs/winlab_network.png)
+
 # Deployment
 
 ## Windows Images
