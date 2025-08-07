@@ -62,7 +62,7 @@ resource "openstack_compute_instance_v2" "kali" {
 
     user_data = file("scripts/cloud_init_linux.yml")
 
-    tags = [ "linux", "kali" ]
+    tags = [ "linux" ]
 
     network {
         name = openstack_networking_network_v2.internet_network.name

