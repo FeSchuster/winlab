@@ -1,3 +1,3 @@
 ---
-ansible_ssh_host: "{{ hostvars['mgmt'].openstack.addresses.winlab_network[1]['addr'] }}"
+ansible_ssh_host: "{{ hostvars['mgmt'].openstack.addresses.internet_network[1]['addr'] }}"
 ansible_ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o StrictHostKeyChecking=no"

@@ -2,10 +2,6 @@
 
 Winlab is an intentionally vulnerable Windows Active Directory lab designed for cybersecurity research.
 
-## Network
-
-![Network](./docs/winlab_network.png)
-
 # Deployment
 
 ## Windows Images
@@ -149,17 +145,11 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
     cd ansible/roles
     git clone git@github.com:FeSchuster/atb-ansible-primarydc.git
     git clone git@github.com:FeSchuster/atb-ansible-msclient.git
-    git clone git@github.com:FeSchuster/atb-ansible-secondarydc.git
     git clone git@github.com:ait-testbed/atb-ansible-kafka.git
     git clone git@github.com:FeSchuster/atb-ansible-winwebserver.git
     git clone git@github.com:FeSchuster/atb-ansible-winvulnserver.git
     git clone git@github.com:FeSchuster/atb-ansible-windowseventcollector.git
     git clone git@github.com:ait-testbed/attackmate-ansible.git
-    # currently unused:
-    git clone git@github.com:ait-testbed/atb-ansible-winfileserver.git
-    git clone git@github.com:ait-testbed/atb-ansible-ghostserver.git
-    git clone git@github.com:ait-testbed/atb-ansible-ghostagent.git
-    git clone git@github.com:ait-testbed/atb-ansible-ghostagent-linux.git
     ```
 
 - Run playbook:
@@ -172,8 +162,8 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
 
 Attacker machine was already configured by the Ansible playbooks, start the attacks with:
 ```bash
-ssh -J aecid@<MGMT_IP> aecid@10.0.0.200
-attackm8 /home/aecid/killchain
+ssh -J superuser@<MGMT_IP> superuser@10.10.10.200
+attackm8 /home/superuser/killchain
 ```
 
 ![Killchain](./docs/winlab_killchain.png)

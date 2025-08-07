@@ -1,8 +1,8 @@
 <powershell>
 # update credentials 
 net user Administrator "P@ssword"
-net user aecid "P@ssword" /add
-net localgroup administrators aecid /add
+net user superuser "P@ssword" /add
+net localgroup administrators superuser /add
 
 # install ssh server, see https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=powershell&pivots=windows-server-2022#install-openssh-for-windows-server
 Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0

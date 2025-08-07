@@ -1,6 +1,6 @@
 #cloud-config
 users:
-  - name: aecid
+  - name: superuser
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: sudo

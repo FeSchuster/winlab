@@ -7,20 +7,17 @@ else
   read -p "MGMT IP: " mgmt_ip
 fi
 
-user="aecid"
+user="superuser"
 known_hosts="$HOME/.ssh/known_hosts"
 
 # List of target hosts
 hosts=(
   "$mgmt_ip"
+  "10.10.10.10"
+  "10.10.10.200"
   "10.0.0.10"
-  "10.0.0.11"
-  "10.0.0.20"
-  "10.0.0.21"
-  "10.0.0.22"
   "10.0.0.100"
-  "10.0.0.101"
-  "10.0.0.200"
+  "10.0.0.251"
 )
 
 echo "Testing SSH connections ..."

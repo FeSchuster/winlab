@@ -24,26 +24,13 @@
   roles:
   - atb-ansible-primarydc
 
-- name: Configure Secondary DC
-  hosts: dc2
-  vars:
-    # atb-ansible-msclient playbook vars
-    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
-    domainName: "aecid-testbed.com"
-    domainAdminAccount: "administrator@aecid-testbed.com"
-    domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
-    hostname: "dc2"
-  roles:
-  - atb-ansible-msclient
-  - atb-ansible-secondarydc
-
 - name: Configure Kafka
   hosts: mgmt
   become: true
   vars:
     # atb-ansible-kafka playbook vars
     kafka_listeners: "INTERNAL://localhost:9093,EXTERNAL://:9092"
-    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['mgmt']['openstack']['addresses']['winlab_network'][0]['addr'] }}:9092"
+    kafka_advertised_listeners: "INTERNAL://localhost:9093,EXTERNAL://{{ hostvars['mgmt']['openstack']['addresses']['internal_network'][0]['addr'] }}:9092"
     kafka_listener_security_proto_map: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
   roles:
   - atb-ansible-kafka
@@ -52,26 +39,26 @@
   hosts: wec
   vars:
     # atb-ansible-msclient playbook vars
-    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['internal_network'][0]['addr'] }}"
     domainName: "aecid-testbed.com"
     domainAdminAccount: "administrator@aecid-testbed.com"
     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
     hostname: "wec"
     # atb-ansible-windowseventcollector playbook vars
-    kafka_broker_ip: "{{ hostvars['mgmt']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    kafka_broker_ip: "{{ hostvars['mgmt']['openstack']['addresses']['internal_network'][0]['addr'] }}"
   roles:
   - atb-ansible-msclient
   - atb-ansible-windowseventcollector
 
 - name: Configure Webserver
-  hosts: webserver
+  hosts: web
   vars:
     # atb-ansible-msclient playbook vars
-    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['winlab_network'][0]['addr'] }}"
+    DNSIP: "{{ hostvars['dc1']['openstack']['addresses']['internal_network'][0]['addr'] }}"
     domainName: "aecid-testbed.com"
     domainAdminAccount: "administrator@aecid-testbed.com"
     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
-    hostname: "webserver"
+    hostname: "web"
     # atb-ansible-winvulnserver playbook vars
     admin_user: "wsadmin@aecid-testbed.com"
     admin_password: "Root.PW1"
@@ -141,37 +128,37 @@
     - name: Copy Attackmate Playbook to Kali Machine
       ansible.builtin.copy:
         src: "../attackmate/killchain.yml"
-        dest: "/home/aecid/killchain.yml"
-        owner: aecid
+        dest: "/home/superuser/killchain.yml"
+        owner: superuser
     - name: Ensure payloads folder exists
       ansible.builtin.file:
-        path: /home/aecid/payloads
+        path: /home/superuser/payloads
         state: directory
     - name: Ensure tmp folder exists
       ansible.builtin.file:
-        path: /home/aecid/tmp/mimikatz
+        path: /home/superuser/tmp/mimikatz
         state: directory
     - name: Download Mimikatz
       ansible.builtin.get_url:
         url: https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip
-        dest: /home/aecid/tmp/mimikatz.zip
+        dest: /home/superuser/tmp/mimikatz.zip
     - name: Unzip Mimikatz
       ansible.builtin.unarchive:
-        src: /home/aecid/tmp/mimikatz.zip
-        dest: /home/aecid/tmp/mimikatz
+        src: /home/superuser/tmp/mimikatz.zip
+        dest: /home/superuser/tmp/mimikatz
         remote_src: yes
-    - name: Move Mimikatz to /home/aecid/payloads
-      shell: mv /home/aecid/tmp/mimikatz/x64/* /home/aecid/payloads/
+    - name: Move Mimikatz to /home/superuser/payloads
+      shell: mv /home/superuser/tmp/mimikatz/x64/* /home/superuser/payloads/
     - name: Clone repository Ghostpack-CompiledBinaries
       git:
         repo: https://github.com/r3motecontrol/Ghostpack-CompiledBinaries.git
-        dest: /home/aecid/tmp/Ghostpack-CompiledBinaries
+        dest: /home/superuser/tmp/Ghostpack-CompiledBinaries
         update: yes
         accept_hostkey: yes
         clone: yes
-    - name: Move Rubeus to /home/aecid/payloads
-      shell: mv /home/aecid/tmp/Ghostpack-CompiledBinaries/Rubeus.exe /home/aecid/payloads/
+    - name: Move Rubeus to /home/superuser/payloads
+      shell: mv /home/superuser/tmp/Ghostpack-CompiledBinaries/Rubeus.exe /home/superuser/payloads/
     - name: Cleanup
       file:
-        path: /home/aecid/tmp
+        path: /home/superuser/tmp
         state: absent

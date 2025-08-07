@@ -26,25 +26,36 @@ variable "provider_network_name" {
     description = "Provider network name"
 }
 
-variable "winlab_subnet" {
+variable "internet_subnet" {
     type        = string
-    description = "Winlab subnet CIDR"
+    description = "Internet subnet CIDR"
+    default     = "10.10.10.0/24"
+}
+
+variable "internal_subnet" {
+    type        = string
+    description = "Internal subnet CIDR"
     default     = "10.0.0.0/24"
 }
 
-variable "winlab_ips" {
+variable "internet_ips" {
     type        = map(string)
-    description = "IP addresses for various machines"
+    description = "Internet IP addresses for various machines"
     default = {
-        dc1 = "10.0.0.10"
-        dc2 = "10.0.0.11"
-        webserver = "10.0.0.20"
-        fileserver = "10.0.0.21"
-        wec = "10.0.0.22"
-        pc1 = "10.0.0.100"
-        pc2 = "10.0.0.101"
-        kali = "10.0.0.200"
+        web = "10.10.10.10"
+        kali = "10.10.10.200"
+        mgmt = "10.10.10.250"
+    }
+}
+
+variable "internal_ips" {
+    type        = map(string)
+    description = "Internal IP addresses for various machines"
+    default = {
+        web = "10.0.0.10"
+        dc1 = "10.0.0.100"
         mgmt = "10.0.0.250"
+        wec = "10.0.0.251"
     }
 }
 
