@@ -28,6 +28,11 @@ resource "openstack_networking_subnet_v2" "internet_subnet" {
     cidr            = var.internet_subnet
     dns_nameservers = ["8.8.8.8", "1.1.1.1"]
     ip_version      = 4
+
+    allocation_pool {
+        start = cidrhost(var.internet_subnet, 9)
+        end = cidrhost(var.internet_subnet, 254)
+    }
 }
 
 resource "openstack_networking_router_interface_v2" "router_interface_internet_subnet" {
@@ -53,6 +58,11 @@ resource "openstack_networking_subnet_v2" "internal_subnet" {
     cidr            = var.internal_subnet
     dns_nameservers = ["8.8.8.8", "1.1.1.1"]
     ip_version      = 4
+
+    allocation_pool {
+        start = cidrhost(var.internal_subnet, 9)
+        end = cidrhost(var.internal_subnet, 254)
+    }
 }
 
 resource "openstack_networking_router_interface_v2" "router_interface_internal_subnet" {

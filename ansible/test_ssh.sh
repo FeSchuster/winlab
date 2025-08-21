@@ -12,12 +12,12 @@ known_hosts="$HOME/.ssh/known_hosts"
 
 # List of target hosts
 hosts=(
-  "$mgmt_ip"
-  "10.10.10.10"
-  "10.10.10.200"
-  "10.0.0.10"
-  "10.0.0.100"
-  "10.0.0.251"
+  "$mgmt_ip"     # mgmt (floating)
+  "10.10.10.10"  # web (internet)
+  "10.10.10.200" # kali (internet)
+  "10.0.0.10"    # web (internal)
+  "10.0.0.100"   # dc1 (internal)
+  "10.0.0.251"   # wec (internal)
 )
 
 echo "Testing SSH connections ..."

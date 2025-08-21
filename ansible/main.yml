@@ -60,12 +60,11 @@
     domainAdminPassword: "%A%4N1lmLFUFTzs4#XnI"
     hostname: "web"
     # atb-ansible-winvulnserver playbook vars
-    admin_user: "wsadmin@aecid-testbed.com"
+    admin_user: "aecid-testbed.com\\wsadmin"
     admin_password: "Root.PW1"
     compromised_user: "aecid-testbed.com\\Alice"
   roles:
   - atb-ansible-msclient
-  - atb-ansible-winwebserver
   - atb-ansible-winvulnserver
 
 - name: Update Group Policy on Windows Machines
@@ -97,7 +96,6 @@
         name:
           - unzip
           - evil-winrm
-          - impacket
           # - metasploit-framework # install an older version instead, there is a bug in attackmate with metasploit version >= 6.4.74
         state: present
         update_cache: yes
@@ -117,12 +115,6 @@
       apt:
         deb: "{{ msf_deb_path }}"
         state: present
-
-- name: Start msfrpcd
-  hosts: kali
-  tasks:
-    - name: Start msfrpcd
-      shell: msfrpcd -P hackerman
 
 - name: Download Binaries
   hosts: kali
@@ -164,3 +156,9 @@
       file:
         path: /home/superuser/tmp
         state: absent
+
+- name: Start msfrpcd
+  hosts: kali
+  tasks:
+    - name: Start msfrpcd
+      shell: msfrpcd -P hackerman

