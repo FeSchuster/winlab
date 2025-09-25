@@ -79,7 +79,7 @@
   become: true
   vars:
     # attackmate-ansible playbook vars
-    attackmate_sliverfix: true
+    attackmate_sliverfix: false
     attackmate_version: development
     attackmate_msf_server: localhost
     attackmate_msf_passwd: hackerman
@@ -143,15 +143,18 @@
         remote_src: yes
     - name: Move Mimikatz to /home/superuser/payloads
       shell: mv /home/superuser/tmp/mimikatz/x64/* /home/superuser/payloads/
-    - name: Clone repository Ghostpack-CompiledBinaries
-      git:
-        repo: https://github.com/r3motecontrol/Ghostpack-CompiledBinaries.git
-        dest: /home/superuser/tmp/Ghostpack-CompiledBinaries
-        update: yes
-        accept_hostkey: yes
-        clone: yes
-    - name: Move Rubeus to /home/superuser/payloads
-      shell: mv /home/superuser/tmp/Ghostpack-CompiledBinaries/Rubeus.exe /home/superuser/payloads/
+    - name: Download SharpGPOAbuse
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Flangvik/SharpCollection/master/NetFramework_4.7_Any/SharpGPOAbuse.exe
+        dest: /home/superuser/payloads/SharpGPOAbuse.exe
+    - name: Download Rubeus
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/Flangvik/SharpCollection/master/NetFramework_4.7_Any/Rubeus.exe
+        dest: /home/superuser/payloads/Rubeus.exe
+    - name: Download NinjaCopy
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/collection/Invoke-NinjaCopy.ps1
+        dest: /home/superuser/payloads/Invoke-NinjaCopy.ps1
     - name: Cleanup
       file:
         path: /home/superuser/tmp

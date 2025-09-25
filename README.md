@@ -165,7 +165,12 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
 Attacker machine was already configured by the Ansible playbooks, start the attacks with:
 ```bash
 ssh -J superuser@<MGMT_IP> superuser@10.10.10.200
-attackm8 /home/superuser/killchain
+attackm8 /home/superuser/killchain.yml
+```
+
+If you receive the error message `Please connect to msfrpcd first` during playbook execution, run:
+```bash
+msfrpcd -P hackerman
 ```
 
 ### Killchain

