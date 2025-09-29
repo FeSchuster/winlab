@@ -153,8 +153,13 @@
         dest: /home/superuser/payloads/Rubeus.exe
     - name: Download NinjaCopy
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/collection/Invoke-NinjaCopy.ps1
+        url: https://raw.githubusercontent.com/BC-SECURITY/Empire/main/empire/server/data/module_source/collection/Invoke-NinjaCopy.ps1
         dest: /home/superuser/payloads/Invoke-NinjaCopy.ps1
+    - name: Fix type casting in Invoke-NinjaCopy.ps1
+      ansible.builtin.replace:
+        path: /home/superuser/payloads/Invoke-NinjaCopy.ps1
+        regexp: '\$PEInfo\.DllCharacteristics'
+        replace: '[int]$PEInfo.DllCharacteristics'
     - name: Cleanup
       file:
         path: /home/superuser/tmp

