@@ -7,6 +7,13 @@
       ansible.builtin.apt:
         update_cache: yes
 
+- name: Set timezone on Linux machines
+  hosts: linux
+  become: true
+  tasks:
+    - name: Set timezone
+      shell: timedatectl set-timezone "Europe/Vienna"
+
 - name: Configure Keyboard Layout on Windows Machines
   hosts: windows
   gather_facts: no
