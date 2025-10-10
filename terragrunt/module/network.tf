@@ -31,7 +31,7 @@ resource "openstack_networking_subnet_v2" "internet_subnet" {
 
     allocation_pool {
         start = cidrhost(var.internet_subnet, 9)
-        end = cidrhost(var.internet_subnet, 254)
+        end = cidrhost(var.internet_subnet, 252)
     }
 }
 
@@ -61,7 +61,7 @@ resource "openstack_networking_subnet_v2" "internal_subnet" {
 
     allocation_pool {
         start = cidrhost(var.internal_subnet, 9)
-        end = cidrhost(var.internal_subnet, 254)
+        end = cidrhost(var.internal_subnet, 252)
     }
 }
 

