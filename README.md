@@ -4,6 +4,51 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
 
 ![Network](./docs/winlab_network.png)
 
+# Attackmate
+
+Attacker machine was already configured by the Ansible playbooks, start the attacks with:
+```bash
+ssh -J superuser@<MGMT_IP> superuser@10.10.10.200
+attackm8 /home/superuser/killchain.yml
+```
+
+If you receive the error message `Please connect to msfrpcd first` during playbook execution, run:
+```bash
+msfrpcd -P hackerman
+```
+
+## Killchain
+
+1. [WEB] Attacker knows credentials and logs into the Windows server using WinRM (T1021)
+2. [WEB] Attacker escalates privileges using:\
+    a) Win-tasks (T1053)\
+    b) Logon scripts (T1037)\
+    c) Modify system process (T1543)
+3. [WEB] Attacker persists malware using:\
+    a) BITS Jobs (T1197)\
+    b) Autostart (T1547)\
+    c) DLL-Hijacking (T1574)\
+    d) Windows-Task (T1053) started by Tracker.exe (T1127)
+4. [WEB] Attacker hides payload using process injection (T1055)
+5. [WEB] Attacker uses Mimikatz to dump credentials (T1003)
+6. [WEB] Attacker moves to domain controller using:\
+    a) Pass-the-hash (T1550)\
+    b) Rouge domain controller (T1207)\
+    c) Kerberroasting (T1558)
+7. [DC1] Attacker uses vssadmin to read out data from volume (T1006)
+8. [DC1] Attacker persists by:\
+    a) Modifying a GPO (T1484)\
+    b) Golden Ticket (T1649)
+
+## Log Collection
+
+Log telemetry is collected by Sysmon, forwarded to the Windows Event Collector (WEC) via Group Policy settings, and then sent to the MGMT host using Kafka. On the MGMT host, all logs are persistently stored in the `/var/lib/kafka/windows-0/` directory.
+
+To watch the logs stream in real time, run the following command:
+```bash
+/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.0.250:9092 --topic windows --from-beginning
+```
+
 # Deployment
 
 ## Windows Images
@@ -150,48 +195,3 @@ Winlab is an intentionally vulnerable Windows Active Directory lab designed for 
     cd ansible
     ansible-playbook main.yml
     ```
-
-## Attackmate
-
-Attacker machine was already configured by the Ansible playbooks, start the attacks with:
-```bash
-ssh -J superuser@<MGMT_IP> superuser@10.10.10.200
-attackm8 /home/superuser/killchain.yml
-```
-
-If you receive the error message `Please connect to msfrpcd first` during playbook execution, run:
-```bash
-msfrpcd -P hackerman
-```
-
-### Killchain
-
-1. [WEB] Attacker knows credentials and logs into the Windows server using WinRM (T1021)
-2. [WEB] Attacker escalates privileges using:\
-    a) Win-tasks (T1053)\
-    b) Logon scripts (T1037)\
-    c) Modify system process (T1543)
-3. [WEB] Attacker persists malware using:\
-    a) BITS Jobs (T1197)\
-    b) Autostart (T1547)\
-    c) DLL-Hijacking (T1574)\
-    d) Windows-Task (T1053) started by Tracker.exe (T1127)
-4. [WEB] Attacker hides payload using process injection (T1055)
-5. [WEB] Attacker uses Mimikatz to dump credentials (T1003)
-6. [WEB] Attacker moves to domain controller using:\
-    a) Pass-the-hash (T1550)\
-    b) Rouge domain controller (T1207)\
-    c) Kerberroasting (T1558)
-7. [DC1] Attacker uses vssadmin to read out data from volume (T1006)
-8. [DC1] Attacker persists by:\
-    a) Modifying a GPO (T1484)\
-    b) Golden Ticket (T1649)
-
-## Log Collection
-
-Log telemetry is collected by Sysmon, forwarded to the Windows Event Collector (WEC) via Group Policy settings, and then sent to the MGMT host using Kafka. On the MGMT host, all logs are persistently stored in the `/var/lib/kafka/windows-0/` directory.
-
-To watch the logs stream in real time, run the following command:
-```bash
-/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.0.250:9092 --topic windows --from-beginning
-```
