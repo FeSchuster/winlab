@@ -1,0 +1,52 @@
+2025-10-28T15:39:57 [debug] Argument OutputPath is set to .
+2025-10-28T15:39:57 [debug] Argument OutputFileName is set to DC1.zip
+2025-10-28T15:39:57 [debug] Argument UserName is set to 
+2025-10-28T15:39:57 [debug] Argument UserPassword is set to [omitted in log file]
+2025-10-28T15:39:57 [debug] Argument SFTPServer is set to 
+2025-10-28T15:39:57 [debug] Argument SFTPOutputPath is set to .
+2025-10-28T15:39:57 [debug] Argument SFTPCleanUp is set to True
+2025-10-28T15:39:57 [debug] Argument CollectionFilePath is set to .
+2025-10-28T15:39:57 [debug] Argument CollectDefaults is set to False
+2025-10-28T15:39:57 [debug] Argument ZipPassword is set to [omitted in log file]
+2025-10-28T15:39:57 [debug] Argument ZipLevel is set to 
+2025-10-28T15:39:57 [debug] Argument LogFilePath is set to CylR.log
+2025-10-28T15:39:57 [debug] Argument DisableLogging is set to False
+2025-10-28T15:39:57 [debug] Argument EnableVerboseConsole is set to False
+2025-10-28T15:39:57 [debug] Argument Usnjrnl is set to False
+2025-10-28T15:39:57 [debug] Argument ForceNative is set to False
+2025-10-28T15:39:57 [debug] Argument DryRun is set to False
+2025-10-28T15:39:57 [debug] Argument CollectionFiles is set to 
+2025-10-28T15:39:57 [info] Gathering paths to collect
+2025-10-28T15:39:57 [debug] Enumerating volumes on system
+2025-10-28T15:39:57 [debug] Identified volumes: C:\
+2025-10-28T15:39:57 [debug] Enumerating patterns for default artifact collection
+2025-10-28T15:39:57 [info] Windows platform detected
+2025-10-28T15:39:57 [debug] Enumerating file systems and matching patterns
+2025-10-28T15:39:57 [debug] Enumerating volume: C:\
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\System Volume Information
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\System Volume Information
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Trace
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Trace
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Temp\PSScriptOutputs
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Temp\PSScriptOutputs
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\SenseCM
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\SenseCM
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Downloads
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\DataCollection
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\DataCollection
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cyber
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cache
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows Defender Advanced Threat Protection\Cache
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\ProgramData\Microsoft\Windows\SystemData
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\ProgramData\Microsoft\Windows\SystemData
+2025-10-28T15:40:09 [warn] Unable to enumerate all files and sub directories in C:\Program Files\Windows Defender Advanced Threat Protection\Classification\Configuration
+2025-10-28T15:40:09 [warn] Access is denied to one or more files in C:\Program Files\Windows Defender Advanced Threat Protection\Classification\Configuration
+2025-10-28T15:40:10 [info] Scanned 235301 paths
+2025-10-28T15:40:10 [info] Found 430 paths to collect
+2025-10-28T15:40:10 [info] 430 paths identified for collection
+2025-10-28T15:40:10 [debug] Set outputPath to ./DC1.zip
+2025-10-28T15:40:10 [debug] Initializing archive file
+2025-10-28T15:40:10 [info] Adding files to archive
+2025-10-28T15:40:40 [info] Collection complete. 0:00:10.6906275 elapsed
